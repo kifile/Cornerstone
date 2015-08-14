@@ -62,11 +62,11 @@ And we obtain DataProvider
 
 #### a.For Activity
 	
-You can see how to use DataProvider [here, Click it]("")
+You can see how to use DataProvider [here, Click it](app/src/main/java/com/kifile/android/sample/cornerstone/SampleActivity.java)
 
 #### b.For Fragment
 
-You can see how to use DataProvider [here, Click it]("")
+You can see how to use DataProvider [here, Click it](app/src/main/java/com/kifile/android/sample/cornerstone/SampleFragment.java)
 
 
 # License
