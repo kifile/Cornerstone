@@ -27,7 +27,7 @@ public interface DataProvider<DATA> {
     void refresh();
 
     /**
-     * Recycle the resources when destroy. If the worker thread is working, stop it.
+     * Release the resources when destroy. If the worker thread is working, stop it.
      */
-    void recycle();
+    void release();
 }

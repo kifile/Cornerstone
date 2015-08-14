@@ -1,13 +1,13 @@
 package com.kifile.android.cornerstone.impl;
 
-import java.util.ArrayList;
-import java.util.List;
+import android.os.Handler;
 
 import com.kifile.android.cornerstone.core.DataFetcher;
 import com.kifile.android.cornerstone.core.DataObserver;
 import com.kifile.android.cornerstone.core.DataProvider;
 
-import android.os.Handler;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The implement of {@link DataProvider}.
@@ -16,7 +16,7 @@ import android.os.Handler;
  */
 public abstract class AbstractDataProvider<DATA> implements DataProvider<DATA> {
 
-    private final List<DataObserver> mObservers = new ArrayList<>();
+    private final List<DataObserver<DATA>> mObservers = new ArrayList<>();
 
     private DATA mData;
 
@@ -24,6 +24,15 @@ public abstract class AbstractDataProvider<DATA> implements DataProvider<DATA> {
 
     // 由于数据加载需要通过异步线程调用，因此在此处创建一个静态的Handler，专门负责主线程通信。
     protected static Handler sHandler = new Handler();
+
+    /**
+     * When you extends AbstractDataProvider, don't make the constructor having any argument.
+     * <p/>
+     * This constructor will be called by {@link com.kifile.android.cornerstone.core.AbstractDataProviderManager}.
+     */
+    public AbstractDataProvider() {
+
+    }
 
     public void setFetcher(DataFetcher<DATA> fetcher) {
         mFetcher = fetcher;
@@ -60,7 +69,7 @@ public abstract class AbstractDataProvider<DATA> implements DataProvider<DATA> {
     }
 
     private void notifyDataChanged() {
-        for (DataObserver observer : mObservers) {
+        for (DataObserver<DATA> observer : mObservers) {
             observer.onDataChanged(mData);
         }
     }
@@ -70,7 +79,7 @@ public abstract class AbstractDataProvider<DATA> implements DataProvider<DATA> {
     }
 
     @Override
-    public void recycle() {
-
+    public void release() {
+        mData = null;
     }
 }

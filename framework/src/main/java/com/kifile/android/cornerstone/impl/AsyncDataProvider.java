@@ -35,7 +35,7 @@ public class AsyncDataProvider<DATA> extends AbstractDataProvider<DATA> {
     }
 
     @Override
-    public void recycle() {
-        super.recycle();
+    public void release() {
+        super.release();
     }
 }

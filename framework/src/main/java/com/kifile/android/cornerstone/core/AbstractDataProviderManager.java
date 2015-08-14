@@ -139,7 +139,7 @@ public abstract class AbstractDataProviderManager {
     }
 
     /**
-     * Release the {@link DataProvider}, and recycle resources if possible.
+     * Release the {@link DataProvider}, and release resources if possible.
      *
      * @param key
      */
@@ -152,7 +152,7 @@ public abstract class AbstractDataProviderManager {
                 if (BuildConfig.DEBUG) {
                     Log.d(TAG, "ReleaseProvider: " + key);
                 }
-                providerCounter.getProvider().recycle();
+                providerCounter.getProvider().release();
                 mDataProviders.remove(key);
             }
         }

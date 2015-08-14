@@ -1,9 +1,9 @@
 package com.kifile.android.cornerstone.impl;
 
+import com.kifile.android.cornerstone.core.DataObserver;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import com.kifile.android.cornerstone.core.DataObserver;
 
 /**
  * @author kifile
@@ -81,10 +81,10 @@ public abstract class CombinedDataProvider extends AbstractDataProvider {
     }
 
     @Override
-    public void recycle() {
-        super.recycle();
+    public void release() {
+        super.release();
         for (AbstractDataProvider provider : mCombinedProviders.values()) {
-            provider.recycle();
+            provider.release();
         }
         mCombinedProviders.clear();
     }
