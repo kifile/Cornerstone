@@ -1,4 +1,6 @@
 apply plugin: 'com.android.library'
+apply plugin: 'maven'
+apply plugin: 'signing'
 
 android {
     compileSdkVersion 22
@@ -20,4 +22,58 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
+}
+
+signing {
+    sign configurations.archives
+}
+
+group = 'com.kifile.android.cornerstone'
+archivesBaseName = 'Cornerstone'
+version = '0.1'
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment {
+                MavenDeployment deployment -> signing.signPom(deployment);
+            }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            pom.project {
+                name 'Cornerstone'
+                packaging 'aar'
+                description 'This project is build to let the view looks like a material design widget when touched. '
+                url 'https://github.com/kifile/Cornerstone'
+
+                scm {
+                    connection 'scm:git:https://github.com/kifile/Cornerstone.git'
+                    developerConnection 'scm:git:https://github.com/kifile/Cornerstone.git'
+                    url 'https://github.com/kifile/Cornerstone.git'
+                }
+
+                licenses {
+                    license {
+                        name 'The Apache License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'kifile'
+                        name 'Kifile Chou'
+                        email 'kifile@kifile.com'
+                    }
+                }
+            }
+        }
+    }
 }
