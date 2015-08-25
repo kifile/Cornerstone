@@ -27,11 +27,11 @@ We followed the following principles to make data managing powerful :
 
 CornerStone supports Android 4.0 (Ice Cream).
 
-**Tips: Exactly, Cornerstone can be used in the platforms below 14 if you edit the build.gradle, but I don't recommend to do that. **
+*Tips: Exactly, Cornerstone can be used in the platforms below 14 if you edit the build.gradle, but I don't recommend to do that. *
 
 # Using Cornerstone
 
-### 1.Import framework(NOT PUBLISHED YET)
+### 1.Import framework
 
 If you are building with gradle, please add the following line to the `dependencies` section of your `build.gradle` file:
 

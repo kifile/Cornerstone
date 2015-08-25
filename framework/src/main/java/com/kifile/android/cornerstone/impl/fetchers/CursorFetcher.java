@@ -8,6 +8,8 @@ import android.net.Uri;
 
 /**
  * Fetch the cursor data from content provider.
+ * <p/>
+ * Do not forget close the cursor when not use.
  *
  * @author kifile
  */

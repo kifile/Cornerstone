@@ -21,7 +21,7 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
 }
 
 signing {
@@ -50,7 +50,7 @@ uploadArchives {
             pom.project {
                 name 'Cornerstone'
                 packaging 'aar'
-                description 'This project is build to let the view looks like a material design widget when touched. '
+                description 'A data manager framework for Android.'
                 url 'https://github.com/kifile/Cornerstone'
 
                 scm {

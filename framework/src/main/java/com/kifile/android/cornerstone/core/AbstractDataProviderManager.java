@@ -110,7 +110,7 @@ public abstract class AbstractDataProviderManager {
      *
      * @return
      */
-    public synchronized DataProvider obtainProvider(String key) {
+    public synchronized DataProvider obtain(String key) {
         DataProvider provider = null;
         ProviderCounter providerCounter = mDataProviders.get(key);
         if (providerCounter != null) {
@@ -146,7 +146,7 @@ public abstract class AbstractDataProviderManager {
      *
      * @param key
      */
-    public synchronized void releaseProvider(String key) {
+    public synchronized void release(String key) {
         ProviderCounter providerCounter = mDataProviders.get(key);
         if (providerCounter != null) {
             providerCounter = mDataProviders.get(key);

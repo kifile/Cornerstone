@@ -1,26 +1,33 @@
 package com.kifile.android.sample.cornerstone;
 
-import android.app.Activity;
+import android.app.ListActivity;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
-
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
 import com.kifile.android.cornerstone.core.DataObserver;
-import com.kifile.android.cornerstone.impl.GlobalDataProviderManager;
+import com.kifile.android.cornerstone.impl.Cornerstone;
+import com.kifile.android.sample.cornerstone.data.SampleDataProvider;
 
-import org.json.JSONObject;
+import java.util.List;
 
 /**
  * The sample of using DataProvider in Activity.
  *
  * @author kifile
  */
-public class SampleActivity extends Activity {
+public class SampleActivity extends ListActivity {
 
     private SampleDataProvider mProvider;
 
-    private DataObserver<JSONObject> mObserver = new DataObserver<JSONObject>() {
+    private DataObserver<List<Class>> mObserver = new DataObserver<List<Class>>() {
         @Override
-        public void onDataChanged(JSONObject jsonObject) {
-            setTitle(jsonObject.toString());
+        public void onDataChanged(List<Class> classes) {
+            setListAdapter(new ActivityAdapter(SampleActivity.this, classes));
         }
     };
 
@@ -29,7 +36,7 @@ public class SampleActivity extends Activity {
         super.onCreate(savedInstanceState);
         if (mProvider == null) {
             mProvider =
-                    (SampleDataProvider) GlobalDataProviderManager.getInstance().obtainProvider(SampleDataProvider.KEY);
+                    (SampleDataProvider) Cornerstone.obtainProvider(SampleDataProvider.KEY);
         }
     }
 
@@ -48,10 +55,55 @@ public class SampleActivity extends Activity {
     @Override
     protected void onDestroy() {
         if (mProvider != null) {
-            GlobalDataProviderManager.getInstance().releaseProvider(SampleDataProvider.KEY);
+            Cornerstone.releaseProvider(SampleDataProvider.KEY);
             mProvider = null;
         }
         super.onDestroy();
+    }
+
+    @Override
+    protected void onListItemClick(ListView l, View v, int position, long id) {
+        super.onListItemClick(l, v, position, id);
+        Class clazz = (Class) getListAdapter().getItem(position);
+        Intent intent = new Intent(this, clazz);
+        startActivity(intent);
+    }
+
+    public class ActivityAdapter extends BaseAdapter {
+
+        private Context mContext;
+
+        private List<Class> mClasses;
+
+        public ActivityAdapter(Context context, List<Class> classes) {
+            mContext = context;
+            mClasses = classes;
+        }
+
+        @Override
+        public int getCount() {
+            return mClasses != null ? mClasses.size() : 0;
+        }
+
+        @Override
+        public Class getItem(int position) {
+            return mClasses.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return 0;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            if (convertView == null) {
+                convertView = new TextView(mContext);
+            }
+            TextView view = (TextView) convertView;
+            view.setText(getItem(position).getSimpleName());
+            return view;
+        }
     }
 
 }

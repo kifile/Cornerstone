@@ -3,10 +3,8 @@ package com.kifile.android.sample.cornerstone;
 import android.app.Activity;
 import android.app.Fragment;
 
-import com.kifile.android.cornerstone.core.DataObserver;
-import com.kifile.android.cornerstone.impl.GlobalDataProviderManager;
-
-import org.json.JSONObject;
+import com.kifile.android.cornerstone.impl.Cornerstone;
+import com.kifile.android.sample.cornerstone.data.SampleDataProvider;
 
 /**
  * The sample of using DataProvider in Fragment.
@@ -17,38 +15,38 @@ public class SampleFragment extends Fragment {
 
     private SampleDataProvider mProvider;
 
-    private DataObserver<JSONObject> mObserver = new DataObserver<JSONObject>() {
-        @Override
-        public void onDataChanged(JSONObject jsonObject) {
-            getActivity().setTitle(jsonObject.toString());
-        }
-    };
+//    private DataObserver<JSONObject> mObserver = new DataObserver<JSONObject>() {
+//        @Override
+//        public void onDataChanged(JSONObject jsonObject) {
+//            getActivity().setTitle(jsonObject.toString());
+//        }
+//    };
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         if (mProvider == null) {
             mProvider =
-                    (SampleDataProvider) GlobalDataProviderManager.getInstance().obtainProvider(SampleDataProvider.KEY);
+                    (SampleDataProvider) Cornerstone.obtainProvider(SampleDataProvider.KEY);
         }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        mProvider.registerDataObserver(mObserver);
+//        mProvider.registerDataObserver(mObserver);
     }
 
     @Override
     public void onPause() {
-        mProvider.unregisterDataObserver(mObserver);
+//        mProvider.unregisterDataObserver(mObserver);
         super.onPause();
     }
 
     @Override
     public void onDetach() {
         if (mProvider != null) {
-            GlobalDataProviderManager.getInstance().releaseProvider(SampleDataProvider.KEY);
+            Cornerstone.releaseProvider(SampleDataProvider.KEY);
             mProvider = null;
         }
         super.onDestroy();

@@ -25,7 +25,7 @@ public abstract class CombinedDataProvider extends AbstractDataProvider {
         mCombinedProviders.put(key, provider);
     }
 
-    protected AbstractDataProvider getProvider(String key) {
+    public AbstractDataProvider getProvider(String key) {
         return mCombinedProviders.get(key);
     }
 
