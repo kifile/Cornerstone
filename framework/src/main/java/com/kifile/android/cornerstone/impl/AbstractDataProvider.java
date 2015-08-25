@@ -68,6 +68,10 @@ public abstract class AbstractDataProvider<DATA> implements DataProvider<DATA> {
 
     }
 
+    public DATA getData() {
+        return mData;
+    }
+
     private void notifyDataChanged() {
         for (DataObserver<DATA> observer : mObservers) {
             observer.onDataChanged(mData);

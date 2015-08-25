@@ -24,13 +24,13 @@ import android.util.Log;
  *      protected void onCreate(Bundle savedInstanceState) {
  *          super.onCreate(savedInstanceState);
  *          if (mProvider == null) {
- *              mProvider = (SampleDataProvider) GlobalDataProviderManager.getInstance().obtainProvider(KEY);
+ *              mProvider = (SampleDataProvider) Cornerstone.getInstance().obtainProvider(KEY);
  *          }
  *      }
  *
  *      protected void onDestroy() {
  *          if (mProvider != null) {
- *              GlobalDataProviderManager.getInstance().releaseProvider(KEY);
+ *              Cornerstone.getInstance().releaseProvider(KEY);
  *              mProvider = null;
  *          }
  *          super.onDestroy();
@@ -53,13 +53,13 @@ import android.util.Log;
  *      protected void onAttach(Activity activity) {
  *          super.onAttach(Activity activity);
  *          if (mProvider == null) {
- *              mProvider = (SampleDataProvider) GlobalDataProviderManager.getInstance().obtainProvider(KEY);
+ *              mProvider = (SampleDataProvider) Cornerstone.getInstance().obtainProvider(KEY);
  *          }
  *      }
  *
  *      protected void onDetach() {
  *          if (mProvider != null) {
- *              GlobalDataProviderManager.getInstance().releaseProvider(KEY);
+ *              Cornerstone.getInstance().releaseProvider(KEY);
  *              mProvider = null;
  *          }
  *          super.onDetach();
@@ -96,6 +96,9 @@ public abstract class AbstractDataProviderManager {
         }
         if (providerClazz == null) {
             throw new NullPointerException("The provider class cannot be null");
+        }
+        if (mDataProviderClasses.containsKey(key)) {
+            throw new IllegalArgumentException("The key[" + key + "] has been registered.");
         }
         mDataProviderClasses.put(key, providerClazz);
     }

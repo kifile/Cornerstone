@@ -19,6 +19,9 @@ public abstract class CombinedDataProvider extends AbstractDataProvider {
      * @param provider
      */
     protected void put(String key, AbstractDataProvider provider) {
+        if (mCombinedProviders.containsKey(key)) {
+            throw new IllegalArgumentException("The key[" + key + "] has been registered.");
+        }
         mCombinedProviders.put(key, provider);
     }
 
