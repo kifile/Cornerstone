@@ -1,6 +1,8 @@
 package com.kifile.android.cornerstone.impl;
 
 /**
+ * Paged data provider.
+ * <p/>
  * Created by kifile on 15/8/25.
  */
 public abstract class PageDataProvider<DATA> extends AbstractDataProvider<PageDataProvider.PageData<DATA>> {
@@ -13,7 +15,7 @@ public abstract class PageDataProvider<DATA> extends AbstractDataProvider<PageDa
     public abstract void loadPage(int page);
 
     @Override
-    protected boolean isDataNeedUpdate() {
+    public boolean isDataNeedUpdate() {
         PageData<DATA> page = getData();
         return page != null && page.page == 0;
     }

@@ -1,11 +1,12 @@
 package com.kifile.android.cornerstone.core;
 
-import java.util.HashMap;
-import java.util.Map;
+import android.util.Log;
 
 import com.kifile.android.cornerstone.BuildConfig;
+import com.kifile.android.cornerstone.impl.CachedDataProvider;
 
-import android.util.Log;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * AbstractDataProviderManager provides a easy way to manage data.
@@ -24,13 +25,13 @@ import android.util.Log;
  *      protected void onCreate(Bundle savedInstanceState) {
  *          super.onCreate(savedInstanceState);
  *          if (mProvider == null) {
- *              mProvider = (SampleDataProvider) Cornerstone.getInstance().obtainProvider(KEY);
+ *              mProvider = (SampleDataProvider) Cornerstone.obtainProvider(KEY);
  *          }
  *      }
  *
  *      protected void onDestroy() {
  *          if (mProvider != null) {
- *              Cornerstone.getInstance().releaseProvider(KEY);
+ *              Cornerstone.releaseProvider(KEY);
  *              mProvider = null;
  *          }
  *          super.onDestroy();
@@ -53,13 +54,13 @@ import android.util.Log;
  *      protected void onAttach(Activity activity) {
  *          super.onAttach(Activity activity);
  *          if (mProvider == null) {
- *              mProvider = (SampleDataProvider) Cornerstone.getInstance().obtainProvider(KEY);
+ *              mProvider = (SampleDataProvider) Cornerstone.obtainProvider(KEY);
  *          }
  *      }
  *
  *      protected void onDetach() {
  *          if (mProvider != null) {
- *              Cornerstone.getInstance().releaseProvider(KEY);
+ *              Cornerstone.releaseProvider(KEY);
  *              mProvider = null;
  *          }
  *          super.onDetach();
@@ -151,6 +152,11 @@ public abstract class AbstractDataProviderManager {
         if (providerCounter != null) {
             providerCounter = mDataProviders.get(key);
             providerCounter.decrease();
+            DataProvider provider = providerCounter.getProvider();
+            if (provider instanceof CachedDataProvider) {
+                CachedDataProvider cachedDataProvider = (CachedDataProvider) provider;
+                cachedDataProvider.tryCache(key);
+            }
             if (providerCounter.empty()) {
                 if (BuildConfig.DEBUG) {
                     Log.d(TAG, "ReleaseProvider: " + key);

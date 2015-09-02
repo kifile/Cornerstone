@@ -1,6 +1,7 @@
 package com.kifile.android.cornerstone.impl;
 
 import com.kifile.android.cornerstone.core.DataObserver;
+import com.kifile.android.cornerstone.core.DataProvider;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,7 +11,7 @@ import java.util.Map;
  */
 public abstract class CombinedDataProvider extends AbstractDataProvider {
 
-    private final Map<String, AbstractDataProvider> mCombinedProviders = new HashMap<>();
+    private final Map<String, DataProvider> mCombinedProviders = new HashMap<>();
 
     /**
      * It should only be called in your constructor.
@@ -18,14 +19,14 @@ public abstract class CombinedDataProvider extends AbstractDataProvider {
      * @param key
      * @param provider
      */
-    protected void put(String key, AbstractDataProvider provider) {
+    protected void put(String key, DataProvider provider) {
         if (mCombinedProviders.containsKey(key)) {
             throw new IllegalArgumentException("The key[" + key + "] has been registered.");
         }
         mCombinedProviders.put(key, provider);
     }
 
-    public AbstractDataProvider getProvider(String key) {
+    public DataProvider getProvider(String key) {
         return mCombinedProviders.get(key);
     }
 
@@ -37,7 +38,7 @@ public abstract class CombinedDataProvider extends AbstractDataProvider {
      */
     @Override
     public void refresh() {
-        for (AbstractDataProvider provider : mCombinedProviders.values()) {
+        for (DataProvider provider : mCombinedProviders.values()) {
             if (provider.isDataNeedUpdate()) {
                 provider.refresh();
             }
@@ -50,11 +51,28 @@ public abstract class CombinedDataProvider extends AbstractDataProvider {
      * @param key
      */
     public void refresh(String key) {
-        AbstractDataProvider provider = getProvider(key);
+        DataProvider provider = getProvider(key);
         if (provider == null) {
             throw new IllegalArgumentException();
         }
         provider.refresh();
+    }
+
+    @Override
+    public void notifyDataChanged() {
+        for (DataProvider provider : mCombinedProviders.values()) {
+            if (provider.isDataNeedUpdate()) {
+                provider.notifyDataChanged();
+            }
+        }
+    }
+
+    public void notifyDataChanged(String key) {
+        DataProvider provider = getProvider(key);
+        if (provider == null) {
+            throw new IllegalArgumentException();
+        }
+        provider.notifyDataChanged();
     }
 
     @Override
@@ -68,7 +86,7 @@ public abstract class CombinedDataProvider extends AbstractDataProvider {
     }
 
     public void registerDataObserver(String key, DataObserver observer) {
-        AbstractDataProvider provider = getProvider(key);
+        DataProvider provider = getProvider(key);
         if (provider == null) {
             throw new IllegalArgumentException();
         }
@@ -76,7 +94,7 @@ public abstract class CombinedDataProvider extends AbstractDataProvider {
     }
 
     public void unregisterDataObserver(String key, DataObserver observer) {
-        AbstractDataProvider provider = getProvider(key);
+        DataProvider provider = getProvider(key);
         if (provider == null) {
             throw new IllegalArgumentException();
         }
@@ -86,7 +104,7 @@ public abstract class CombinedDataProvider extends AbstractDataProvider {
     @Override
     public void release() {
         super.release();
-        for (AbstractDataProvider provider : mCombinedProviders.values()) {
+        for (DataProvider provider : mCombinedProviders.values()) {
             provider.release();
         }
         mCombinedProviders.clear();

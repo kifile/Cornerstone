@@ -5,7 +5,7 @@ package com.kifile.android.cornerstone.impl;
  *
  * @author kifile
  */
-public class AsyncDataProvider<DATA> extends AbstractDataProvider<DATA> {
+public abstract class AsyncDataProvider<DATA> extends AbstractDataProvider<DATA> {
 
     @Override
     public void refresh() {

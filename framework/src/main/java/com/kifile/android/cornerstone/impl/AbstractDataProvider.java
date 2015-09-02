@@ -28,6 +28,8 @@ public abstract class AbstractDataProvider<DATA> implements DataProvider<DATA> {
     /**
      * When you extends AbstractDataProvider, don't make the constructor having any argument.
      * <p/>
+     * Unless you want to control the provider by yourself like {@link CombinedDataProvider}
+     * <p/>
      * This constructor will be called by {@link com.kifile.android.cornerstone.core.AbstractDataProviderManager}.
      */
     public AbstractDataProvider() {
@@ -61,7 +63,7 @@ public abstract class AbstractDataProvider<DATA> implements DataProvider<DATA> {
     }
 
     protected synchronized void setData(DATA data) {
-        if (mData == null || !mData.equals(data)) {
+        if (mData == null || !mData.equals(data) || isDataNeedUpdate()) {
             mData = data;
             notifyDataChanged();
         }
@@ -72,13 +74,15 @@ public abstract class AbstractDataProvider<DATA> implements DataProvider<DATA> {
         return mData;
     }
 
-    private void notifyDataChanged() {
+    @Override
+    public void notifyDataChanged() {
         for (DataObserver<DATA> observer : mObservers) {
             observer.onDataChanged(mData);
         }
     }
 
-    protected boolean isDataNeedUpdate() {
+    @Override
+    public boolean isDataNeedUpdate() {
         return mData == null;
     }
 

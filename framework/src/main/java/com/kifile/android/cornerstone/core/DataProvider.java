@@ -27,6 +27,16 @@ public interface DataProvider<DATA> {
     void refresh();
 
     /**
+     * Notify observers data changed.
+     */
+    void notifyDataChanged();
+
+    /**
+     * @return If the data need update, return true.
+     */
+    boolean isDataNeedUpdate();
+
+    /**
      * Release the resources when destroy. If the worker thread is working, stop it.
      */
     void release();
