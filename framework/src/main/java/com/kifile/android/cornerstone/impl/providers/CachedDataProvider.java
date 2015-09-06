@@ -1,13 +1,15 @@
-package com.kifile.android.cornerstone.impl;
+package com.kifile.android.cornerstone.impl.providers;
 
 import android.util.Log;
 
 import com.kifile.android.cornerstone.BuildConfig;
+import com.kifile.android.cornerstone.core.DataProvider;
+import com.kifile.android.cornerstone.impl.Cornerstone;
 
 /**
  * @author kifile
  */
-public class CachedDataProvider<DATA> extends AbstractDataProvider<DATA> {
+public class CachedDataProvider<DATA> extends DecoratorDataProvider<DATA> {
 
     private static final String TAG = CachedDataProvider.class.getSimpleName();
 
@@ -16,6 +18,10 @@ public class CachedDataProvider<DATA> extends AbstractDataProvider<DATA> {
     private long mCacheTime = DEFAULT_CACHE_TIME;
 
     private boolean mCached;
+
+    public CachedDataProvider(DataProvider<DATA> proxy) {
+        super(proxy);
+    }
 
     public void setCacheTime(long time) {
         mCacheTime = DEFAULT_CACHE_TIME;

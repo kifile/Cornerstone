@@ -1,7 +1,7 @@
 package com.kifile.android.sample.cornerstone.data;
 
 import com.kifile.android.cornerstone.core.DataFetcher;
-import com.kifile.android.cornerstone.impl.AbstractDataProvider;
+import com.kifile.android.cornerstone.impl.providers.AbstractDataProvider;
 import com.kifile.android.sample.cornerstone.ContactFetcherActivity;
 import com.kifile.android.sample.cornerstone.SampleActivity;
 

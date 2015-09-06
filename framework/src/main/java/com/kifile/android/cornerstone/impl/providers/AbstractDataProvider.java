@@ -1,4 +1,4 @@
-package com.kifile.android.cornerstone.impl;
+package com.kifile.android.cornerstone.impl.providers;
 
 import android.os.Handler;
 
@@ -36,6 +36,7 @@ public abstract class AbstractDataProvider<DATA> implements DataProvider<DATA> {
 
     }
 
+    @Override
     public void setFetcher(DataFetcher<DATA> fetcher) {
         mFetcher = fetcher;
     }
@@ -70,6 +71,7 @@ public abstract class AbstractDataProvider<DATA> implements DataProvider<DATA> {
 
     }
 
+    @Override
     public DATA getData() {
         return mData;
     }

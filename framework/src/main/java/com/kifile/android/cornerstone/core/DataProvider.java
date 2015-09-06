@@ -1,11 +1,15 @@
 package com.kifile.android.cornerstone.core;
 
+import com.kifile.android.cornerstone.impl.providers.AbstractDataProvider;
+
 /**
- * The interface of {@link com.kifile.android.cornerstone.impl.AbstractDataProvider}
+ * The interface of {@link AbstractDataProvider}
  *
  * @author kifile
  */
 public interface DataProvider<DATA> {
+
+    void setFetcher(DataFetcher<DATA> fetcher);
 
     /**
      * Add the observer into watch list, when data changed, notify it.
@@ -30,6 +34,8 @@ public interface DataProvider<DATA> {
      * Notify observers data changed.
      */
     void notifyDataChanged();
+
+    DATA getData();
 
     /**
      * @return If the data need update, return true.

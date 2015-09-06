@@ -1,11 +1,17 @@
-package com.kifile.android.cornerstone.impl;
+package com.kifile.android.cornerstone.impl.providers;
+
+import com.kifile.android.cornerstone.core.DataProvider;
 
 /**
  * Fetch Data on a no-ui thread.
  *
  * @author kifile
  */
-public abstract class AsyncDataProvider<DATA> extends AbstractDataProvider<DATA> {
+public abstract class AsyncDataProvider<DATA> extends DecoratorDataProvider<DATA> {
+
+    private AsyncDataProvider(DataProvider<DATA> proxy) {
+        super(proxy);
+    }
 
     @Override
     public void refresh() {
@@ -15,7 +21,7 @@ public abstract class AsyncDataProvider<DATA> extends AbstractDataProvider<DATA>
             @Override
             public void run() {
                 super.run();
-                setData(mFetcher.fetch());
+                AsyncDataProvider.super.refresh();
             }
         }.start();
     }
@@ -34,8 +40,4 @@ public abstract class AsyncDataProvider<DATA> extends AbstractDataProvider<DATA>
         super.setData(data);
     }
 
-    @Override
-    public void release() {
-        super.release();
-    }
 }

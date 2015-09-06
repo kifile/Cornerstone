@@ -1,4 +1,4 @@
-package com.kifile.android.cornerstone.impl;
+package com.kifile.android.cornerstone.impl.providers;
 
 import com.kifile.android.cornerstone.core.DataObserver;
 import com.kifile.android.cornerstone.core.DataProvider;

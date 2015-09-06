@@ -1,4 +1,4 @@
-package com.kifile.android.cornerstone.impl;
+package com.kifile.android.cornerstone.impl.providers;
 
 /**
  * Paged data provider.

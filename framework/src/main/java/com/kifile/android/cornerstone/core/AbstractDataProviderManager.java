@@ -3,7 +3,7 @@ package com.kifile.android.cornerstone.core;
 import android.util.Log;
 
 import com.kifile.android.cornerstone.BuildConfig;
-import com.kifile.android.cornerstone.impl.CachedDataProvider;
+import com.kifile.android.cornerstone.impl.providers.CachedDataProvider;
 
 import java.util.HashMap;
 import java.util.Map;

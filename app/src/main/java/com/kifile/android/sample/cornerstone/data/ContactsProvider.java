@@ -5,7 +5,7 @@ import android.database.Cursor;
 import android.provider.ContactsContract;
 import com.kifile.android.cornerstone.core.AbstractFetcherConverter;
 import com.kifile.android.cornerstone.core.DataFetcher;
-import com.kifile.android.cornerstone.impl.AbstractDataProvider;
+import com.kifile.android.cornerstone.impl.providers.AbstractDataProvider;
 import com.kifile.android.cornerstone.impl.fetchers.CursorFetcher;
 import com.kifile.android.sample.cornerstone.SampleApplication;
 

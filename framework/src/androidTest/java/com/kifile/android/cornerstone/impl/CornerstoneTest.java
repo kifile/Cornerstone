@@ -1,5 +1,6 @@
 package com.kifile.android.cornerstone.impl;
 
+import com.kifile.android.cornerstone.impl.providers.CombinedDataProvider;
 import junit.framework.TestCase;
 
 /**
