@@ -48,6 +48,19 @@ public class CursorFetcher implements DataFetcher<Cursor> {
         return this;
     }
 
+    /**
+     * If you want to change the params of fetcher, call it to reset the old params.
+     *
+     * @return
+     */
+    public CursorFetcher clear() {
+        mProjections = null;
+        mSelection = null;
+        mSelectionArgs = null;
+        mOrderBy = null;
+        return this;
+    }
+
     @Override
     public Cursor fetch() {
         return mResolver.query(mUri, mProjections, mSelection, mSelectionArgs, mOrderBy);
