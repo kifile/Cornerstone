@@ -39,16 +39,16 @@ If you are building with gradle, please add the following line to the `dependenc
 	
 ### 2.Register DataProvider Before Use It
 
-We use the GlobalDataProviderManager to manage all the DataProviders. It means that you shouldn't create a new DataProvider by yourself. 
+We use the Cornerstone to manage all the DataProviders. It means that you shouldn't create a new DataProvider by yourself.
 
-The right way to get a DataProvider is registering a DataProvider in your GlobalDataProviderManager, then obtaining it from  the method `obtainProvider(KEY)` in GlobalDataProviderManager.
+The right way to get a DataProvider is registering a DataProvider in your Cornerstone, then obtaining it from  the method `obtainProvider(KEY)` in GlobalDataProviderManager.
 
 I suggested registering in your Application class like the followings:
 
 	public class App extends Application {
 		
 		static {
-			AbstractDataProviderManager manager = GlobalDataProviderManager().getInstance();
+			AbstractDataProviderManager manager = Cornerstone.getInstance();
 			manager.register(EXAMPLE_KEY, ExampleDataProvider.class);
 		}
 		
