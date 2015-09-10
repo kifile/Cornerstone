@@ -16,7 +16,7 @@ import java.util.Map;
  * <p/>
  * Created by kifile on 15/9/10.
  */
-public class PropertyCursorFetcher<DATA> extends AbstractFetcherConverter<Cursor, List<DATA>> {
+public class AnnotationCursorConverter<DATA> extends AbstractFetcherConverter<Cursor, List<DATA>> {
 
     private final Class<DATA> mDataClazz;
 
@@ -27,7 +27,7 @@ public class PropertyCursorFetcher<DATA> extends AbstractFetcherConverter<Cursor
      *
      * @param proxy
      */
-    public PropertyCursorFetcher(DataFetcher<Cursor> proxy, Class<DATA> clazz) {
+    public AnnotationCursorConverter(DataFetcher<Cursor> proxy, Class<DATA> clazz) {
         super(proxy);
         mDataClazz = clazz;
         processAnnotation();
