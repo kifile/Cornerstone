@@ -3,6 +3,8 @@ package com.kifile.android.cornerstone.impl.providers;
 import com.kifile.android.cornerstone.core.DataProvider;
 import com.kifile.android.cornerstone.utils.WorkerThreadPool;
 
+import java.util.concurrent.Executor;
+
 /**
  * Fetch Data on a no-ui thread.
  *
@@ -10,23 +12,36 @@ import com.kifile.android.cornerstone.utils.WorkerThreadPool;
  */
 public class AsyncDataProvider<DATA> extends DecoratorDataProvider<DATA> {
 
-    private AsyncDataProvider(DataProvider<DATA> proxy) {
+    private Executor mExecutor;
+
+    public AsyncDataProvider(DataProvider<DATA> proxy) {
         super(proxy);
+    }
+
+    public AsyncDataProvider(DataProvider<DATA> proxy, Executor executor) {
+        super(proxy);
+        mExecutor = executor;
     }
 
     private WorkerThreadPool.WorkerRunnable mWorker;
 
+    private final Runnable mSuperRefresh = new Runnable() {
+        @Override
+        public void run() {
+            AsyncDataProvider.super.refresh();
+        }
+    };
+
     @Override
     public void refresh() {
-        if (mWorker != null) {
-            mWorker.cancel();
-        }
-        mWorker = WorkerThreadPool.getInstance().execute(new Runnable() {
-            @Override
-            public void run() {
-                AsyncDataProvider.super.refresh();
+        if (mExecutor != null) {
+            mExecutor.execute(mSuperRefresh);
+        } else {
+            if (mWorker != null) {
+                mWorker.cancel();
             }
-        });
+            mWorker = WorkerThreadPool.getInstance().execute(mSuperRefresh);
+        }
     }
 
     @Override

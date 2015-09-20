@@ -20,6 +20,15 @@ public abstract class PageDataProvider<DATA> extends AbstractDataProvider<PageDa
         return page != null && page.page == 0;
     }
 
+    @Override
+    protected synchronized void setData(PageData<DATA> dataPageData) {
+        throw new RuntimeException("Should call #setPageData to setData");
+    }
+
+    public void setPageData(int page, DATA data) {
+        super.setData(new PageData<>(page, data));
+    }
+
     public static class PageData<DATA> {
 
         public int page;
