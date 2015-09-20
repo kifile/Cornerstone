@@ -8,6 +8,8 @@ Using CornerStone can reduce your work of fetching data and releasing data.
 
 You can pay more attention on the other thing.
 
+[中文文档](http://kifile.github.io/Cornerstone)
+
 # Introduce
 
 An android application is consist of data and view.
@@ -35,7 +37,7 @@ CornerStone supports Android 4.0 (Ice Cream).
 
 If you are building with gradle, please add the following line to the `dependencies` section of your `build.gradle` file:
 
-	compile 'com.kifile.android.cornerstone:Cornerstone:0.2'
+	compile 'com.kifile.android.cornerstone:Cornerstone:1.0'
 	
 ### 2.Register DataProvider Before Use It
 
@@ -48,8 +50,7 @@ I suggested registering in your Application class like the followings:
 	public class App extends Application {
 		
 		static {
-			AbstractDataProviderManager manager = Cornerstone.getInstance();
-			manager.register(EXAMPLE_KEY, ExampleDataProvider.class);
+			Cornerstone.registerProvider(EXAMPLE_KEY, ExampleDataProvider.class);
 		}
 		
 	}
