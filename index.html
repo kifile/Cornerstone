@@ -13,7 +13,7 @@ layout: default
 				<p>目前本项目的最低版本sdk为14(其实更改build.gradle，可以任意兼容,毕竟没有使用到多少系统api,只是我比较任性,😔)</p>
 				<p>在Android开发中，其实有很多时候，我们会觉得数据管理是一个很蛋疼的存在，</p>
 				<h2 id="overview-class">项目类图</h2>
-				<img src="/assets/img/overview-class.png">
+				<img src="/Cornerstone/assets/img/overview-class.png">
 				<p>如上图所示，在本框架内，所有类的衍射都是基于以上四个类。他们的具体作用见 <a href="#class">这里</a></p>
 				<h2 id="overview-dependency">添加项目依赖</h2>
 				<p>在AndroidStudio工程下,在dependencies里加入</p>
@@ -57,7 +57,7 @@ layout: default
 					DataProvider
 				</h1>
 				<h2 id="dataprovider-class">类图</h2>
-				<img src="/assets/img/dataprovider-class.png">
+				<img src="/Cornerstone/assets/img/dataprovider-class.png">
 				<h2 id="dataprovider-abstract">AbstractDataProvider</h2>
 				<p>AbstractDataProvider是DataProvider的具体实现，同时也是其他类的父类，他在内部维护了一个DataObserver,当用户需要当前数据的时候，通过register方法注册监听，当不需要时，通过unregister反注册监听</p>
 				<p>同时，在AbstractDataProvider中拥有一个Handler对象，负责在主线程发送数据更新消息，以确保用户收到消息时，都是在主线程进行消息处理，防止因为操作ui线程导致异常。</p>
@@ -81,7 +81,7 @@ layout: default
 				<p>DataFetcher的作用其实很简单，就是在refresh的时候，获取数据，因此如果你不想使用DataFetcher去获取数据，你也可以自己实现。</p>
 				<p>在日常开发中，其实我们获取数据的方式来源看似很多，但其实归根结底莫过于从文件，从网络，从数据库中获取，这几种形式而已，而从网络和从文件中获取的基本格式都是InputStream，因此我们首先规定了常用的数据格式，然后使用AbstractFetcherConverter的衍生类进行数据封装。</p>
 				<h2 id="datafetcher-class">类图<h2>
-				<img src="/assets/img/datafetcher-class.png">
+				<img src="/Cornerstone/assets/img/datafetcher-class.png">
 				<h2 id="datafetcher-file">FileFetcher</h2>
 				<p>从文件中获取InputStream类型数据</p>
 				<h2 id="datafetcher-cursor">CursorFetcher</h2>
