@@ -25,3 +25,5 @@ proguard/
 
 # Log Files
 *.log
+.sass-cache
+_site

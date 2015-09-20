@@ -1,0 +1,160 @@
+---
+layout: default
+---
+<div id="top" class="container bs-doc-container">
+	<div class="row">
+		<div class="col-md-9" role="main">
+			<div class="bs-docs-section">
+				<h1 id="overview" class="page-header">
+					概览
+				</h1>
+				<p class="lead">Cornerstone是一个开源的Android数据管理框架，旨在为Android搭建一个更便捷的数据管理平台,将界面和数据分离，从而减轻开发者的开发成本。</p>
+				<h2 id="overview-summary">项目简介</h2>
+				<p>目前本项目的最低版本sdk为14(其实更改build.gradle，可以任意兼容,毕竟没有使用到多少系统api,只是我比较任性,😔)</p>
+				<p>在Android开发中，其实有很多时候，我们会觉得数据管理是一个很蛋疼的存在，</p>
+				<h2 id="overview-class">项目类图</h2>
+				<img src="/assets/img/overview-class.png">
+				<p>如上图所示，在本框架内，所有类的衍射都是基于以上四个类。他们的具体作用见 <a href="#class">这里</a></p>
+				<h2 id="overview-dependency">添加项目依赖</h2>
+				<p>在AndroidStudio工程下,在dependencies里加入</p>
+				<div class="highlight">
+					<pre>
+						<code class="language-grovvy" data-lang="grovvy">
+							<p><span>compile 'com.kifile.android.cornerstone:Cornerstone:0.2'</span></p>
+						</code>
+					</pre>
+				</div>
+				<p>在Eclipse工程下,暂时不提供Jar包，但是你可以去maven仓库下，下载aar解压获取jar包</p>
+				<h2 id="overview-usage">使用方法</h2>
+				<p>之后我会写一个完善的demo工程，不过这个也可以先看着<a href="https://github.com/kifile/Cornerstone/tree/master/app">Sample</a></p>
+			</div>
+			<div class="bs-docs-section">
+				<h1 id="class" class="page-header">
+					核心类作用介绍
+				</h1>
+				<p>前文说过，本框架是一个以四个核心类为中心组成的框架，他们的作用分别如下</p>
+				<h2 id="class-dataprovidermanager">DataProviderManager</h2>
+				<p>DataProviderManager负责在对所有的DataProvider进行管理(创建、销毁)</p>
+				<p>目前项目的单例DataProviderManager是Cornerstone这个类，只负责单例化，具体实现在AbstractDataProviderManager中。(建议在Application类中统一注册，方便管理)</p>
+				<p>如果你想使用DataProviderManager对DataProvider进行统一管理，那么请在获取DataProvider之前，调用registerProvider方法</p>
+				<p>DataProviderManager在内部使用了自动计数，统计DataProvider的使用数，以保证无用资源被及时回收</p>
+				<p>因此在开发的时候，我们应该尽可能的利用Android自身的生命周期，进行数据类的获取和释放</p>
+				<p>例如，在Activity中，我们应该在onCreate的时候调用obtainProvider,在onDestory的使用调用releaseProvider</p>
+				<p>同理，在Fragment中，我们应该在onAttach的时候调用obtainProvider,在onDetach的时候调用releaseProvider</p>
+				<p>通过这样的方式，来保证DataProviderManager中计数器的值正确。（当然如果你想自己管理生命周期，我是不会拒绝的）</p>
+				<h2 id="class-dataprovider">DataProvider</h2>
+				<p>DataProvider负责数据的持有，以及其他数据相关逻辑的处理</p>
+				<p>他和子类的相关详情，请点击<a href="#dataprovider">这里</a></p>
+				<h2 id="class-datafetcher">DataFetcher</h2>
+				<p>DataFetcher负责数据的获取</p>
+				<p>他和子类的相关详情，请点击<a href="#datafetcher">这里</a></p>
+				<h2 id="class-dataobserver">DataObserver</h2>
+				<p>DataObserver作为数据观察者，当DataProvider的数据发生变化时，获取消息提示。</p>
+				<p>DataObserver应该在需要监听数据变化的时候，调用DataProvider的registerDataObserver方法，然后在不再需要注册监听的时候，调用unregisterDataObserver方法</p>
+			</div>
+			<div class="bs-docs-section">
+				<h1 id="dataprovider" class="page-header">
+					DataProvider
+				</h1>
+				<h2 id="dataprovider-class">类图</h2>
+				<img src="/assets/img/dataprovider-class.png">
+				<h2 id="dataprovider-abstract">AbstractDataProvider</h2>
+				<p>AbstractDataProvider是DataProvider的具体实现，同时也是其他类的父类，他在内部维护了一个DataObserver,当用户需要当前数据的时候，通过register方法注册监听，当不需要时，通过unregister反注册监听</p>
+				<p>同时，在AbstractDataProvider中拥有一个Handler对象，负责在主线程发送数据更新消息，以确保用户收到消息时，都是在主线程进行消息处理，防止因为操作ui线程导致异常。</p>
+				<h2 id="dataprovider-combined">CombinedDataProvider</h2>
+				<p>ConbinedDataProvider是一个AbstractDataProvder的统合类。</p>
+				<p>我们通常都是按照模块来进行数据管理的，而对于同一个模块，他可能是有多个数据组成，但是我们又希望他们同时存在，此时我们应该通过CombinedDataProvider来进行统一的数据管理，在CombinedDataProvider内部，我们拥有多个DataProvider，他们通过CombinedDataProvider.put的方式，通过关键字注册到CombinedDataProvider内，负责管理指定的单个数据</p>
+				<p>如果希望对CombinedDataProvider中指定数据变化进行监听，此时，应该通过register(key,observer)的形式进行监听，而不是registerDataObserver(observer)</p>
+				<h2 id="dataprovider-page">PageDataProvider</h2>
+				<p>PageDataProvider是一个支持分页数据的数据持有类。在其内部有一个PageData的内部静态类，他有两个属性，一个是page页码，一个是具体的数据，因此，我们可以通过setPageData的形式，设置好指定页码的数据，然后通过观察者模式，告诉观察者们究竟是那一页的数据发生了变化。</p>
+				<h2 id="dataprovider-decorator">DecoratorDataProvider</h2>
+				<p>DecoratorDataProvider是一个抽象的代理类，他其实只是做了一次方法的代理,真正的实现逻辑在其具体实现类中</p>
+				<h3 id="dataprovider-async">AsyncDataProvider</h3>
+				<p>AsyncDataProvider是一个异步数据加载类，其在refresh的时候，通过自己的线程池，在异步处理数据获取（主要用于网络访问或耗时较久的操作）,数据获取完成之后，通过sHandler发送到主线程进行数据更新操作。</p>
+				<h3 id="dataprovider-cached">CachedDataProvider</h3>
+				<p>CachedDataProvider其实是一个用于增加缓存时间的代理类，由于我们有时候并不希望在操作完成之后，马上就删除掉数据，可能需要延迟一段时间，确保真的不再有用户继续使用的时候，才进行数据回收，操作，此时，当系统调用releaseProvider时，如果判断计数器为0，则判断类型，调用trayCache方法(这里再考虑一下有没有其他方法可以实现，降低耦合)，发送一次obtainProvider消息，保证在缓存时间内数据不被销毁</p>
+			</div>
+			<div class="bs-docs-section">
+				<h1 id="datafetcher" class="page-header">
+					DataFetcher
+				</h1>
+				<p>DataFetcher的作用其实很简单，就是在refresh的时候，获取数据，因此如果你不想使用DataFetcher去获取数据，你也可以自己实现。</p>
+				<p>在日常开发中，其实我们获取数据的方式来源看似很多，但其实归根结底莫过于从文件，从网络，从数据库中获取，这几种形式而已，而从网络和从文件中获取的基本格式都是InputStream，因此我们首先规定了常用的数据格式，然后使用AbstractFetcherConverter的衍生类进行数据封装。</p>
+				<h2 id="datafetcher-class">类图<h2>
+				<img src="/assets/img/datafetcher-class.png">
+				<h2 id="datafetcher-file">FileFetcher</h2>
+				<p>从文件中获取InputStream类型数据</p>
+				<h2 id="datafetcher-cursor">CursorFetcher</h2>
+				<p>从数据库中获取Cursor类型数据</p>
+				<h2 id="datafetcher-converter">AbstractFetcherConverter</h2>
+				<p>AbstractFetcherConverter是整个数据获取类的一个核心吧，他是一个抽象类，主要作用是将一种格式的数据通过处理转化为另外一种格式的数据，他不在意数据的真正来源，只在意数据当前的格式，因此如果我们想要将从网上获取的数据转换为JSONArray，可以通过多重装饰器将获取到的网络InputStream转化为我们想要的JSONArray对象。(由于网络库，大家不同人用的不一样，所以网络方面的Fecther我就没有写出来了)</p>
+				<h3 id="datafetcher-converter-inputstream2string">InputStream2StringConverter</h3>
+				<p>将InputStream对象转化为String</p>
+				<h3 id="datafetcher-converter-inputstream2bitmap">InputStream2BitmapConverter</h3>
+				<p>将InputStram对象转化为Bitmap</p>
+				<h3 id="datafetcher-converter-string2jsonobject">String2JSONObjectConverter</h3>
+				<p>将String转化为JSONObject</p>
+				<h3 id="datafetcher-converter-string2jsonarray">String2JSONArrayConverter</h3>
+				<p>将String转化为JSONArray</p>
+				<h3 id="datafetcher-converter-annotationjsonarray">AnnotationJSONArrayConverter</h3>
+				<p>通过注解的方式，直接将JSONArray中的对象，实例化为指定类的List</p>
+				<h3 id="datafetcher-converter-annotationcursor">AnnotationCursorConverter</h3>
+				<p>通过注解的方式，直接将Cursor中的对象，实例化为指定类的List</p>
+			</div>
+		</div>
+		<div class="col-md-3" role="complementary">
+			<nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix">
+				<ul class="nav bs-docs-sidenav">
+					<li><a href="#overview">概览</a>
+						<ul class="nav">
+							<li><a href="#overview-summary">项目简介</a></li>
+							<li><a href="#overview-class">项目类图</a></li>
+							<li><a href="#overview-dependency">添加项目依赖</a></li>
+							<li><a href="#overview-usage">使用方法</a></li>
+						</ul>
+					</li>
+					<li><a href="#class">核心类作用介绍</a>
+						<ul class="nav">
+							<li><a href="#class-dataprovidermanager">DataProviderManager</a></li>
+							<li><a href="#class-dataprovider">DataProvider</a></li>
+							<li><a href="#class-datafetcher">DataFetcher</a></li>
+							<li><a href="#class-dataobserver">DataObserver</a></li>
+						</ul>
+					</li>
+					<li><a href="#dataprovider">DataProvider</a>
+						<ul class="nav">
+							<li><a href="#dataprovider-class">类图</a></li>
+							<li><a href="#dataprovider-abstract">AbstractDataProvider</a></li>
+							<li><a href="#dataprovider-combined">CombinedDataProvider</a></li>
+							<li><a href="#dataprovider-page">PageDataProvider</a></li>
+							<li><a href="#dataprovider-decorator">DecoratorDataProvider</a>
+								<ul class="nav">
+									<li><a href="#dataprovider-async">AsyncDataProvider</a></li>
+									<li><a href="#dataprovider-cached">CachedDataProvider</a></li>
+								</ul>
+							</li>
+						</ul>
+					</li>
+					<li><a href="#datafetcher">DataFetcher</a>
+						<ul class="nav">
+							<li><a href="#datafetcher-class">类图</a></li>
+							<li><a href="#datafetcher-file">FileFetcher</a></li>
+							<li><a href="#datafetcher-cursor">CursorFetcher</a></li>
+							<li><a href="#datafetcher-converter">AbstractFetcherConverter</a>
+								<ul class="nav">
+									<li><a href="#datafetcher-converter-inputstream2string">InputStream2StringConverter</a></li>
+									<li><a href="#datafetcher-converter-inputstream2bitmap">InputStream2BitmapConverter</a></li>
+									<li><a href="#datafetcher-converter-string2jsonobject">String2JSONObjectConverter</a></li>
+									<li><a href="#datafetcher-converter-string2jsonarray">String2JSONArrayConverter</a></li>
+									<li><a href="#datafetcher-converter-annotationjsonarray">AnnotationJSONArrayConverter</a></li>
+									<li><a href="#datafetcher-converter-annotationcursor">AnnotationCursorConverter</a></li>
+								</ul>
+							</li>
+						</ul>
+					</li>
+				</ul>
+				<a class="back-to-top" href="#top">返回顶部</a>
+			</nav>
+		</div>
+	</div>
+</div>
