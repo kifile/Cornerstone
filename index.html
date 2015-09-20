@@ -10,8 +10,9 @@ layout: default
 				</h1>
 				<p class="lead">Cornerstone是一个开源的Android数据管理框架，旨在为Android搭建一个更便捷的数据管理平台,将界面和数据分离，从而减轻开发者的开发成本。</p>
 				<h2 id="overview-summary">项目简介</h2>
+				<p>Cornerstone(基石)的项目名是希望它能够像一块基石一样奠定整个项目的数据模块的基础，稳定，持久，可信赖。</p>
 				<p>目前本项目的最低版本sdk为14(其实更改build.gradle，可以任意兼容,毕竟没有使用到多少系统api,只是我比较任性,😔)</p>
-				<p>在Android开发中，其实有很多时候，我们会觉得数据管理是一个很蛋疼的存在，</p>
+				<p>在Android开发中，数据管理应该同界面显示相分离，我们在进行交互的时候，并不希望数据和界面耦合过深，所以我建立了Cornerstone，希望他能够做好数据的管理，回收，监听工作。</p>
 				<h2 id="overview-class">项目类图</h2>
 				<img src="/Cornerstone/assets/img/overview-class.png">
 				<p>如上图所示，在本框架内，所有类的衍射都是基于以上四个类。他们的具体作用见 <a href="#class">这里</a></p>
@@ -20,7 +21,7 @@ layout: default
 				<div class="highlight">
 					<pre>
 						<code class="language-grovvy" data-lang="grovvy">
-							<p><span>compile 'com.kifile.android.cornerstone:Cornerstone:0.2'</span></p>
+							<p><span>compile 'com.kifile.android.cornerstone:Cornerstone:1.0'</span></p>
 						</code>
 					</pre>
 				</div>
@@ -56,6 +57,7 @@ layout: default
 				<h1 id="dataprovider" class="page-header">
 					DataProvider
 				</h1>
+				<p>DataProvider的作用绝不仅限于对数据的持有，在实际项目中由于不同的数据形式，我们对数据的操作其实是有所不同的，因此我们实现一个DataProvider的时候，应该在内部实现自己的数据处理方法，然后再obtainProvider的时候，进行一次强行类型转换，方便使用。</p>
 				<h2 id="dataprovider-class">类图</h2>
 				<img src="/Cornerstone/assets/img/dataprovider-class.png">
 				<h2 id="dataprovider-abstract">AbstractDataProvider</h2>
