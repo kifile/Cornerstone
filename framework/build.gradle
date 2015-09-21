@@ -30,7 +30,7 @@ signing {
 
 group = 'com.kifile.android.cornerstone'
 archivesBaseName = 'Cornerstone'
-version = '1.0'
+version = '1.0.1'
 
 uploadArchives {
     repositories {

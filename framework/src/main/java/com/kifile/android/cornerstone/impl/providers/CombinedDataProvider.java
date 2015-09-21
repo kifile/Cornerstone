@@ -59,7 +59,7 @@ public abstract class CombinedDataProvider extends AbstractDataProvider {
     }
 
     @Override
-    public void notifyDataChanged() {
+    public synchronized void notifyDataChanged() {
         for (DataProvider provider : mCombinedProviders.values()) {
             if (provider.isDataNeedUpdate()) {
                 provider.notifyDataChanged();
@@ -67,7 +67,7 @@ public abstract class CombinedDataProvider extends AbstractDataProvider {
         }
     }
 
-    public void notifyDataChanged(String key) {
+    public synchronized void notifyDataChanged(String key) {
         DataProvider provider = getProvider(key);
         if (provider == null) {
             throw new IllegalArgumentException();

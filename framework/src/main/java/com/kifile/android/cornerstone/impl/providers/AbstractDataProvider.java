@@ -63,7 +63,7 @@ public abstract class AbstractDataProvider<DATA> implements DataProvider<DATA> {
         mObservers.remove(observer);
     }
 
-    protected synchronized void setData(DATA data) {
+    protected void setData(DATA data) {
         if (mData == null || !mData.equals(data) || isDataNeedUpdate()) {
             mData = data;
             notifyDataChanged();
@@ -77,7 +77,7 @@ public abstract class AbstractDataProvider<DATA> implements DataProvider<DATA> {
     }
 
     @Override
-    public void notifyDataChanged() {
+    public synchronized void notifyDataChanged() {
         for (DataObserver<DATA> observer : mObservers) {
             observer.onDataChanged(mData);
         }
