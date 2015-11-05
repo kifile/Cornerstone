@@ -1,6 +1,5 @@
 package com.kifile.android.cornerstone.impl.providers;
 
-import com.kifile.android.cornerstone.core.DataProvider;
 import com.kifile.android.cornerstone.utils.WorkerThreadPool;
 
 import java.util.concurrent.Executor;
@@ -10,16 +9,14 @@ import java.util.concurrent.Executor;
  *
  * @author kifile
  */
-public class AsyncDataProvider<DATA> extends DecoratorDataProvider<DATA> {
+public class AsyncDataProvider<DATA> extends AbstractDataProvider<DATA> {
 
     private Executor mExecutor;
 
-    public AsyncDataProvider(DataProvider<DATA> proxy) {
-        super(proxy);
+    public AsyncDataProvider() {
     }
 
-    public AsyncDataProvider(DataProvider<DATA> proxy, Executor executor) {
-        super(proxy);
+    public AsyncDataProvider(Executor executor) {
         mExecutor = executor;
     }
 
@@ -40,7 +37,7 @@ public class AsyncDataProvider<DATA> extends DecoratorDataProvider<DATA> {
             if (mWorker != null) {
                 mWorker.cancel();
             }
-            mWorker = WorkerThreadPool.getInstance().execute(mSuperRefresh);
+            mWorker = WorkerThreadPool.getInstance().execute(mSuperRefresh, true);
         }
     }
 
