@@ -1,6 +1,7 @@
 package com.kifile.android.cornerstone.impl.fetchers;
 
 import android.database.Cursor;
+
 import com.kifile.android.cornerstone.core.AbstractFetcherConverter;
 import com.kifile.android.cornerstone.core.DataFetcher;
 import com.kifile.android.cornerstone.impl.annotations.Property;
@@ -88,7 +89,9 @@ public class AnnotationCursorConverter<DATA> extends AbstractFetcherConverter<Cu
                             }
                         }
                         datas.add(data);
-                    } catch (InstantiationException | IllegalAccessException e) {
+                    } catch (InstantiationException e) {
+                        e.printStackTrace();
+                    } catch (IllegalAccessException e) {
                         e.printStackTrace();
                     }
                 }

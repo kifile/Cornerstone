@@ -15,9 +15,7 @@ gen/
 # Gradle files
 .gradle/
 build/
-/*/build/
-/.idea/workspace.xml
-/.idea/libraries
+.idea/
 .DS_Store
 captures/
 
@@ -29,4 +27,5 @@ proguard/
 
 # Log Files
 *.log
+*.iml
 /*/gradle.properties
