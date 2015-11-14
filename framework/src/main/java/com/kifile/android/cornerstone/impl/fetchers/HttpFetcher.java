@@ -1,0 +1,175 @@
+package com.kifile.android.cornerstone.impl.fetchers;
+
+import com.kifile.android.cornerstone.core.DataFetcher;
+import com.kifile.android.utils.HttpUtils;
+import com.squareup.okhttp.Headers;
+import com.squareup.okhttp.MediaType;
+import com.squareup.okhttp.MultipartBuilder;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.RequestBody;
+import com.squareup.okhttp.Response;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Map;
+
+/**
+ * 网络库访问.
+ *
+ * @author kifile
+ */
+public class HttpFetcher implements DataFetcher<InputStream> {
+
+    public static final int METHOD_HEAD = 0;
+    public static final int METHOD_GET = 1;
+    public static final int METHOD_POST = 2;
+    public static final int METHOD_DELETE = 3;
+    public static final int METHOD_PUT = 4;
+    public static final int METHOD_PATCH = 5;
+
+    private final int mMethod;
+
+    private final String mUrl;
+
+    private Map<String, String> mParams;
+
+    private Map<String, FileEntry> mFileParams;
+
+    private Headers mHttpHeader;
+
+    public HttpFetcher(int method, String url) {
+        mMethod = method;
+        mUrl = url;
+    }
+
+    public void clear() {
+        mParams = null;
+        mFileParams = null;
+        mHttpHeader = null;
+    }
+
+    public void setParams(Map<String, String> params) {
+        mParams = params;
+    }
+
+    public void setFileParams(Map<String, FileEntry> fileParams) {
+        mFileParams = fileParams;
+    }
+
+    public void setHttpHeader(Map<String, String> headers) {
+        if (headers != null) {
+            Headers.Builder headerBuilder = new Headers.Builder();
+            for (Map.Entry<String, String> header : headers.entrySet()) {
+                headerBuilder.add(header.getKey(), header.getValue());
+            }
+            setHttpHeader(headerBuilder.build());
+        }
+    }
+
+    public void setHttpHeader(Headers header) {
+        mHttpHeader = header;
+    }
+
+    @Override
+    public InputStream fetch() {
+        Request.Builder requestBuilder;
+        switch (mMethod) {
+            case METHOD_HEAD: {
+                requestBuilder = new Request.Builder().url(mUrl).head();
+                break;
+            }
+            case METHOD_GET: {
+                String url = appendParams(mUrl, mParams);
+                requestBuilder = new Request.Builder().url(url).get();
+                break;
+            }
+            case METHOD_POST: {
+                requestBuilder = new Request.Builder().url(mUrl).post(getRequestBody(mParams, mFileParams));
+                break;
+            }
+            case METHOD_DELETE: {
+                requestBuilder = new Request.Builder().url(mUrl).delete(getRequestBody(mParams, mFileParams));
+                break;
+            }
+            case METHOD_PUT: {
+                requestBuilder = new Request.Builder().url(mUrl).put(getRequestBody(mParams, mFileParams));
+                break;
+            }
+            case METHOD_PATCH: {
+                requestBuilder = new Request.Builder().url(mUrl).patch(getRequestBody(mParams, mFileParams));
+                break;
+            }
+            default:
+                throw new IllegalArgumentException("Unsupported method:" + mMethod);
+        }
+        if (requestBuilder != null) {
+            try {
+                if (mHttpHeader != null) {
+                    requestBuilder.headers(mHttpHeader);
+                }
+                Response response = HttpUtils.getResponse(requestBuilder.build());
+                if (response.isSuccessful()) {
+                    return response.body().byteStream();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+    private String appendParams(String url, Map<String, String> params) {
+        StringBuffer link = new StringBuffer(url);
+        if (params != null) {
+            boolean first = true;
+            for (Map.Entry<String, String> param : params.entrySet()) {
+                if (first) {
+                    first = false;
+                    link.append("?");
+                } else {
+                    link.append("&");
+                }
+                link.append(param.getKey()).append("=").append(param.getValue());
+            }
+        }
+        return link.toString();
+    }
+
+    private RequestBody getRequestBody(Map<String, String> params, Map<String, FileEntry> fileParams) {
+        if ((params == null || params.size() == 0) && (fileParams == null || fileParams.size() == 0)) {
+            return RequestBody.create(null, new byte[0]);
+        }
+        MultipartBuilder builder = new MultipartBuilder();
+        if (params != null) {
+            for (Map.Entry<String, String> entry : params.entrySet()) {
+                builder.addFormDataPart(entry.getKey(), entry.getValue());
+            }
+        }
+        if (fileParams != null) {
+            for (Map.Entry<String, FileEntry> fileEntry : fileParams.entrySet()) {
+                FileEntry entry = fileEntry.getValue();
+                builder.addFormDataPart(fileEntry.getKey(), entry.file.getName(),
+                        RequestBody.create(MediaType.parse(entry.mime), entry.file));
+            }
+        }
+        return builder.build();
+    }
+
+    public static class FileEntry {
+
+        public File file;
+
+        public String mime;
+
+        private FileEntry(File file, String mime) {
+            this.file = file;
+            this.mime = mime;
+        }
+
+        public static FileEntry create(File file, String mime) {
+            return new FileEntry(file, mime);
+        }
+
+    }
+}

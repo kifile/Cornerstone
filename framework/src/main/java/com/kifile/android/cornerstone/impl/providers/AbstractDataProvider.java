@@ -5,7 +5,7 @@ import android.os.Handler;
 import com.kifile.android.cornerstone.core.DataFetcher;
 import com.kifile.android.cornerstone.core.DataObserver;
 import com.kifile.android.cornerstone.core.DataProvider;
-import com.kifile.android.cornerstone.utils.ThreadUtils;
+import com.kifile.android.utils.ThreadUtils;
 
 import java.util.ArrayList;
 import java.util.List;

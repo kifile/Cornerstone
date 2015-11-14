@@ -21,8 +21,8 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    provided 'com.squareup.okhttp:okhttp:2.5.0'
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile 'com.kifile.android.utils:utils:0.2'
 }
 
 signing {
@@ -31,7 +31,7 @@ signing {
 
 group = 'com.kifile.android.cornerstone'
 archivesBaseName = 'Cornerstone'
-version = '1.0.1'
+version = '1.1'
 
 uploadArchives {
     repositories {

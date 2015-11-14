@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Cornerstone</string>
+    <string name="title_activity_http">HttpActivity</string>
 </resources>

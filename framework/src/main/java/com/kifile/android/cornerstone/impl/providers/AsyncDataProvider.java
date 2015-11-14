@@ -1,6 +1,6 @@
 package com.kifile.android.cornerstone.impl.providers;
 
-import com.kifile.android.cornerstone.utils.WorkerThreadPool;
+import com.kifile.android.utils.WorkerThreadPool;
 
 import java.util.concurrent.Executor;
 

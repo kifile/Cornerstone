@@ -3,6 +3,7 @@ package com.kifile.android.sample.cornerstone.data;
 import com.kifile.android.cornerstone.core.DataFetcher;
 import com.kifile.android.cornerstone.impl.providers.AbstractDataProvider;
 import com.kifile.android.sample.cornerstone.ContactFetcherActivity;
+import com.kifile.android.sample.cornerstone.HttpActivity;
 import com.kifile.android.sample.cornerstone.SampleActivity;
 
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ public class SampleDataProvider extends AbstractDataProvider<List<Class>> {
         SampleActivityFetcher fetcher = new SampleActivityFetcher();
         fetcher.addActivity(SampleActivity.class);
         fetcher.addActivity(ContactFetcherActivity.class);
+        fetcher.addActivity(HttpActivity.class);
         setFetcher(fetcher);
     }
 

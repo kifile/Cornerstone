@@ -1,8 +1,10 @@
 package com.kifile.android.sample.cornerstone;
 
 import android.app.Application;
+
 import com.kifile.android.cornerstone.impl.Cornerstone;
 import com.kifile.android.sample.cornerstone.data.ContactsProvider;
+import com.kifile.android.sample.cornerstone.data.HttpSampleProvider;
 import com.kifile.android.sample.cornerstone.data.SampleDataProvider;
 
 /**
@@ -17,6 +19,7 @@ public class SampleApplication extends Application {
     static {
         Cornerstone.registerProvider(SampleDataProvider.KEY, SampleDataProvider.class);
         Cornerstone.registerProvider(ContactsProvider.KEY, ContactsProvider.class);
+        Cornerstone.registerProvider(HttpSampleProvider.KEY, HttpSampleProvider.class);
     }
 
     @Override
