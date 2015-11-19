@@ -23,6 +23,7 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.kifile.android.utils:utils:0.2'
+    compile 'com.squareup.okhttp:okhttp:2.5.0'
 }
 
 signing {

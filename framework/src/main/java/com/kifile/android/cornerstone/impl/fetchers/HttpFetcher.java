@@ -1,13 +1,19 @@
 package com.kifile.android.cornerstone.impl.fetchers;
 
+import android.util.Log;
+
 import com.kifile.android.cornerstone.core.DataFetcher;
-import com.kifile.android.utils.HttpUtils;
+import com.kifile.android.cornerstone.utils.HttpUtils;
+import com.squareup.okhttp.FormEncodingBuilder;
 import com.squareup.okhttp.Headers;
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.MultipartBuilder;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,7 +34,12 @@ public class HttpFetcher implements DataFetcher<InputStream> {
     public static final int METHOD_PUT = 4;
     public static final int METHOD_PATCH = 5;
 
+    public static final int BODY_TYPE_FORM = 0;
+    public static final int BODY_TYPE_JSON = 1;
+
     private final int mMethod;
+
+    private int mBodyType;
 
     private final String mUrl;
 
@@ -43,7 +54,12 @@ public class HttpFetcher implements DataFetcher<InputStream> {
         mUrl = url;
     }
 
-    public void clear() {
+    public void setBodyType(int type) {
+        mBodyType = type;
+    }
+
+    public void reset() {
+        mBodyType = BODY_TYPE_FORM;
         mParams = null;
         mFileParams = null;
         mHttpHeader = null;
@@ -111,6 +127,8 @@ public class HttpFetcher implements DataFetcher<InputStream> {
                 Response response = HttpUtils.getResponse(requestBuilder.build());
                 if (response.isSuccessful()) {
                     return response.body().byteStream();
+                } else {
+                    Log.e("HttpBody", response.body().string());
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -137,23 +155,47 @@ public class HttpFetcher implements DataFetcher<InputStream> {
     }
 
     private RequestBody getRequestBody(Map<String, String> params, Map<String, FileEntry> fileParams) {
-        if ((params == null || params.size() == 0) && (fileParams == null || fileParams.size() == 0)) {
-            return RequestBody.create(null, new byte[0]);
-        }
-        MultipartBuilder builder = new MultipartBuilder();
-        if (params != null) {
-            for (Map.Entry<String, String> entry : params.entrySet()) {
-                builder.addFormDataPart(entry.getKey(), entry.getValue());
+        switch (mBodyType) {
+            case BODY_TYPE_FORM: {
+                if ((params == null || params.size() == 0) && (fileParams == null || fileParams.size() == 0)) {
+                    return RequestBody.create(null, new byte[0]);
+                } else if (fileParams == null || fileParams.size() == 0) {
+                    FormEncodingBuilder builder = new FormEncodingBuilder();
+                    for (Map.Entry<String, String> entry : params.entrySet()) {
+                        builder.add(entry.getKey(), entry.getValue());
+                    }
+                    return builder.build();
+                } else {
+                    MultipartBuilder builder = new MultipartBuilder();
+                    if (params != null) {
+                        for (Map.Entry<String, String> entry : params.entrySet()) {
+                            builder.addFormDataPart(entry.getKey(), entry.getValue());
+                        }
+                    }
+                    for (Map.Entry<String, FileEntry> fileEntry : fileParams.entrySet()) {
+                        FileEntry entry = fileEntry.getValue();
+                        builder.addFormDataPart(fileEntry.getKey(), entry.file.getName(),
+                                RequestBody.create(MediaType.parse(entry.mime), entry.file));
+                    }
+                    return builder.build();
+                }
             }
-        }
-        if (fileParams != null) {
-            for (Map.Entry<String, FileEntry> fileEntry : fileParams.entrySet()) {
-                FileEntry entry = fileEntry.getValue();
-                builder.addFormDataPart(fileEntry.getKey(), entry.file.getName(),
-                        RequestBody.create(MediaType.parse(entry.mime), entry.file));
+            case BODY_TYPE_JSON: {
+                JSONObject body = new JSONObject();
+                if (params != null) {
+                    for (Map.Entry<String, String> entry : params.entrySet()) {
+                        try {
+                            body.put(entry.getKey(), entry.getValue());
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                return RequestBody.create(MediaType.parse("application/json"), body.toString());
             }
+            default:
+                return null;
         }
-        return builder.build();
     }
 
     public static class FileEntry {
