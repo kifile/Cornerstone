@@ -19,6 +19,7 @@ public class HttpUtils {
 
     static {
         // 设置连接 15 秒超时.
+        sClient.setWriteTimeout(15, TimeUnit.SECONDS);
         sClient.setConnectTimeout(15, TimeUnit.SECONDS);
         sClient.setReadTimeout(15, TimeUnit.SECONDS);
     }
@@ -27,7 +28,9 @@ public class HttpUtils {
      * 执行Request命令.
      *
      * @param request
+     *
      * @return
+     *
      * @throws IOException
      */
     public static Response getResponse(Request request) throws IOException {

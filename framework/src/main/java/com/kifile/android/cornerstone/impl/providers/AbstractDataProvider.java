@@ -7,8 +7,8 @@ import com.kifile.android.cornerstone.core.DataObserver;
 import com.kifile.android.cornerstone.core.DataProvider;
 import com.kifile.android.utils.ThreadUtils;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * The implement of {@link DataProvider}.
@@ -17,7 +17,7 @@ import java.util.List;
  */
 public abstract class AbstractDataProvider<DATA> implements DataProvider<DATA> {
 
-    private final List<DataObserver<DATA>> mObservers = new ArrayList<>();
+    private final List<DataObserver<DATA>> mObservers = new CopyOnWriteArrayList<>();
 
     private DATA mData;
 
@@ -43,7 +43,7 @@ public abstract class AbstractDataProvider<DATA> implements DataProvider<DATA> {
     }
 
     @Override
-    public synchronized void registerDataObserver(final DataObserver<DATA> observer) {
+    public void registerDataObserver(final DataObserver<DATA> observer) {
         checkMainThread();
         mObservers.add(observer);
         if (isDataNeedUpdate()) {
@@ -61,7 +61,7 @@ public abstract class AbstractDataProvider<DATA> implements DataProvider<DATA> {
     }
 
     @Override
-    public synchronized void unregisterDataObserver(DataObserver observer) {
+    public void unregisterDataObserver(DataObserver observer) {
         checkMainThread();
         mObservers.remove(observer);
     }
@@ -80,7 +80,7 @@ public abstract class AbstractDataProvider<DATA> implements DataProvider<DATA> {
     }
 
     @Override
-    public synchronized void notifyDataChanged() {
+    public void notifyDataChanged() {
         checkMainThread();
         for (DataObserver<DATA> observer : mObservers) {
             observer.onDataChanged(mData);
