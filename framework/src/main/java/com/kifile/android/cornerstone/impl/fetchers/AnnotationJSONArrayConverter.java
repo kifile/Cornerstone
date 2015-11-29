@@ -3,6 +3,7 @@ package com.kifile.android.cornerstone.impl.fetchers;
 import com.kifile.android.cornerstone.core.AbstractFetcherConverter;
 import com.kifile.android.cornerstone.core.DataFetcher;
 import com.kifile.android.cornerstone.impl.annotations.Property;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -53,37 +54,56 @@ public class AnnotationJSONArrayConverter<DATA> extends AbstractFetcherConverter
     protected List<DATA> convert(JSONArray array) {
         if (array != null) {
             List<DATA> datas = new ArrayList<>();
-            for (int i = 0; i < array.length(); i++) {
-                try {
-                    JSONObject object = array.getJSONObject(i);
-                    DATA data = mDataClazz.newInstance();
-                    for (Map.Entry<String, Field> entry : mAnnotationMap.entrySet()) {
-                        Field field = entry.getValue();
-                        String key = entry.getKey();
-                        Class<?> clazz = field.getType();
-                        if (clazz.equals(String.class)) {
-                            // For String data.
-                            field.set(data, object.optString(key));
-                        } else if (clazz.equals(Integer.class) || clazz.equals(int.class)) {
-                            // For int data.
-                            field.set(data, object.optInt(key));
-                        } else if (clazz.equals(Long.class) || clazz.equals(long.class)) {
-                            // For long data.
-                            field.set(data, object.optLong(key));
-                        } else if (clazz.equals(Double.class) || clazz.equals(double.class)) {
-                            // For double data.
-                            field.set(data, object.optDouble(key));
-                        } else if (clazz.equals(Boolean.class) || clazz.equals(boolean.class)) {
-                            // For boolean data.
-                            field.set(data, object.optBoolean(key));
-                        } else {
-                            throw new RuntimeException("Unsupported type:" + field.getName() + field.getType().getName());
+            try {
+                for (int i = 0; i < array.length(); i++) {
+                    try {
+                        JSONObject object = array.getJSONObject(i);
+                        DATA data = mDataClazz.newInstance();
+                        for (Map.Entry<String, Field> entry : mAnnotationMap.entrySet()) {
+                            Field field = entry.getValue();
+                            String key = entry.getKey();
+                            Class<?> clazz = field.getType();
+                            if (clazz.equals(String.class)) {
+                                // For String data.
+                                field.set(data, object.optString(key));
+                            } else if (clazz.equals(Integer.class) || clazz.equals(int.class)) {
+                                // For int data.
+                                field.set(data, object.optInt(key));
+                            } else if (clazz.equals(Long.class) || clazz.equals(long.class)) {
+                                // For long data.
+                                field.set(data, object.optLong(key));
+                            } else if (clazz.equals(Double.class) || clazz.equals(double.class)) {
+                                // For double data.
+                                field.set(data, object.optDouble(key));
+                            } else if (clazz.equals(Boolean.class) || clazz.equals(boolean.class)) {
+                                // For boolean data.
+                                field.set(data, object.optBoolean(key));
+                            } else if (clazz.equals(List.class)) {
+                                // For list class type,
+                                Property property = field.getAnnotation(Property.class);
+                                Class<?> itemType = property.type();
+                                Object value = new AnnotationJSONArrayConverter<>(
+                                        new DataConverter<>(object.optJSONArray(key)), itemType).fetch();
+                                field.set(data, value);
+                            } else {
+                                // For other class type,
+                                Object value = new AnnotationJSONObjectConverter<>(
+                                        new DataConverter<>(object.optJSONObject(key)), clazz).fetch();
+                                field.set(data, value);
+                            }
                         }
+                        datas.add(data);
+                    } catch (JSONException ignore) {
+                        // Maybe the JSONArray just hold the value array.
+                        Class<?> clazz = mDataClazz;
+                        DATA object = (DATA) array.opt(i);
+                        datas.add(object);
                     }
-                    datas.add(data);
-                } catch (InstantiationException | IllegalAccessException | JSONException e) {
-                    e.printStackTrace();
                 }
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
             }
             return datas;
         }

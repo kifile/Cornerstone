@@ -66,7 +66,10 @@ public class AnnotationJSONObjectConverter<DATA> extends AbstractFetcherConverte
                         // For boolean data.
                         field.set(data, jsonObject.optBoolean(key));
                     } else {
-                        throw new RuntimeException("Unsupported type:" + field.getName() + field.getType().getName());
+                        // For other class type,
+                        Object value = new AnnotationJSONObjectConverter<>(
+                                new DataConverter<>(jsonObject.optJSONObject(key)), clazz).fetch();
+                        field.set(data, value);
                     }
                 }
                 return data;

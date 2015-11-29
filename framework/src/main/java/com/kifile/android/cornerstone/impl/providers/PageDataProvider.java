@@ -1,5 +1,8 @@
 package com.kifile.android.cornerstone.impl.providers;
 
+import com.kifile.android.cornerstone.core.DataFetcher;
+import com.kifile.android.utils.WorkerThreadPool;
+
 /**
  * Paged data provider.
  * <p/>
@@ -7,21 +10,51 @@ package com.kifile.android.cornerstone.impl.providers;
  */
 public abstract class PageDataProvider<DATA> extends AbstractDataProvider<PageDataProvider.PageData<DATA>> {
 
+    private DataFetcher<DATA> mFetcher;
+
     @Override
-    public void refresh() {
+    public void setFetcher(DataFetcher<PageData<DATA>> fetcher) {
+        throw new RuntimeException("Should call #setPageFetcher to setFetcher");
+    }
+
+    public void setPageFetcher(DataFetcher<DATA> fetcher) {
+        mFetcher = fetcher;
+    }
+
+    /**
+     * When refresh, load the page at 0.
+     */
+    @Override
+    public final void refresh() {
         loadPage(0);
     }
 
-    public abstract void loadPage(int page);
+    public void loadPage(final int page) {
+        if (mIsAsync) {
+            cancelAsyncTask();
+            mWorker = WorkerThreadPool.getInstance().execute(new Runnable() {
+                @Override
+                public void run() {
+                    if (mFetcher != null) {
+                        setPageData(page, mFetcher.fetch());
+                    }
+                }
+            }, true);
+        } else {
+            if (mFetcher != null) {
+                setPageData(page, mFetcher.fetch());
+            }
+        }
+    }
 
     @Override
     public boolean isDataNeedUpdate() {
         PageData<DATA> page = getData();
-        return page != null && page.page == 0;
+        return page == null || page.page != 0;
     }
 
     @Override
-    protected synchronized void setData(PageData<DATA> dataPageData) {
+    protected void setData(PageData<DATA> dataPageData) {
         throw new RuntimeException("Should call #setPageData to setData");
     }
 

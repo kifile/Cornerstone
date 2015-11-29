@@ -85,6 +85,7 @@ public class AnnotationCursorConverter<DATA> extends AbstractFetcherConverter<Cu
                                 // For boolean data.
                                 field.set(data, cursor.getInt(column) != 0);
                             } else {
+                                // CursorConverter don't support other type.
                                 throw new RuntimeException("Unsupported type:" + field.getName() + field.getType().getName());
                             }
                         }

@@ -6,10 +6,16 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Created by kifile on 15/9/10.
+ * Property Annotation is used in DataConverter to auto-wired data.
+ * <p/>
+ *
+ * @author kifile
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Property {
+
     String name();
+
+    Class<?> type() default Void.class; // type is used to mark which type the list will hold.
 }

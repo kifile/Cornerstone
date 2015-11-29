@@ -6,6 +6,7 @@ import com.kifile.android.cornerstone.core.DataFetcher;
 import com.kifile.android.cornerstone.core.DataObserver;
 import com.kifile.android.cornerstone.core.DataProvider;
 import com.kifile.android.utils.ThreadUtils;
+import com.kifile.android.utils.WorkerThreadPool;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -23,8 +24,21 @@ public abstract class AbstractDataProvider<DATA> implements DataProvider<DATA> {
 
     protected DataFetcher<DATA> mFetcher;
 
+    protected boolean mIsAsync;
+
+    protected WorkerThreadPool.WorkerRunnable mWorker;
+
     // 由于数据加载需要通过异步线程调用，因此在此处创建一个静态的Handler，专门负责主线程通信。
     protected static Handler sHandler = new Handler();
+
+    private final Runnable mRefreshTask = new Runnable() {
+        @Override
+        public void run() {
+            if (mFetcher != null) {
+                setData(mFetcher.fetch());
+            }
+        }
+    };
 
     /**
      * When you extends AbstractDataProvider, don't make the constructor having any argument.
@@ -35,6 +49,22 @@ public abstract class AbstractDataProvider<DATA> implements DataProvider<DATA> {
      */
     public AbstractDataProvider() {
 
+    }
+
+    /**
+     * Set if the fetch task run on a non-main thread.
+     *
+     * @param async
+     */
+    public void setAsync(boolean async) {
+        mIsAsync = async;
+    }
+
+    protected void cancelAsyncTask() {
+        if (mWorker != null) {
+            mWorker.cancel();
+            mWorker = null;
+        }
     }
 
     @Override
@@ -55,8 +85,11 @@ public abstract class AbstractDataProvider<DATA> implements DataProvider<DATA> {
 
     @Override
     public void refresh() {
-        if (mFetcher != null) {
-            setData(mFetcher.fetch());
+        if (mIsAsync) {
+            cancelAsyncTask();
+            mWorker = WorkerThreadPool.getInstance().execute(mRefreshTask, true);
+        } else {
+            mRefreshTask.run();
         }
     }
 
@@ -66,12 +99,17 @@ public abstract class AbstractDataProvider<DATA> implements DataProvider<DATA> {
         mObservers.remove(observer);
     }
 
-    protected void setData(DATA data) {
-        if (mData == null || !mData.equals(data) || isDataNeedUpdate()) {
-            mData = data;
-            notifyDataChanged();
-        }
-
+    protected void setData(final DATA data) {
+        // Always use handler to post the notify task.
+        sHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                if (mData == null || !mData.equals(data) || isDataNeedUpdate()) {
+                    mData = data;
+                    notifyDataChanged();
+                }
+            }
+        });
     }
 
     @Override
@@ -94,6 +132,7 @@ public abstract class AbstractDataProvider<DATA> implements DataProvider<DATA> {
 
     @Override
     public void release() {
+        cancelAsyncTask();
         mData = null;
     }
 
