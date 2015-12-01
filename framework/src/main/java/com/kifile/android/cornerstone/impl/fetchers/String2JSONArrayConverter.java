@@ -1,10 +1,13 @@
 package com.kifile.android.cornerstone.impl.fetchers;
 
-import org.json.JSONArray;
-import org.json.JSONException;
+import android.annotation.NonNull;
 
 import com.kifile.android.cornerstone.core.AbstractFetcherConverter;
+import com.kifile.android.cornerstone.core.ConvertException;
 import com.kifile.android.cornerstone.core.DataFetcher;
+
+import org.json.JSONArray;
+import org.json.JSONException;
 
 /**
  * Convert String to JSONArray.
@@ -18,15 +21,11 @@ public class String2JSONArrayConverter extends AbstractFetcherConverter<String, 
     }
 
     @Override
-    protected JSONArray convert(String s) {
-        JSONArray array = null;
-        if (s != null) {
-            try {
-                array = new JSONArray(s);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+    protected JSONArray convert(@NonNull String s) throws ConvertException {
+        try {
+            return new JSONArray(s);
+        } catch (JSONException e) {
+            throw new ConvertException(e);
         }
-        return array;
     }
 }

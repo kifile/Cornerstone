@@ -1,15 +1,17 @@
 package com.kifile.android.cornerstone.impl.providers;
 
+import android.annotation.NonNull;
 import android.os.Handler;
+import android.os.Looper;
 
 import com.kifile.android.cornerstone.core.DataFetcher;
 import com.kifile.android.cornerstone.core.DataObserver;
 import com.kifile.android.cornerstone.core.DataProvider;
-import com.kifile.android.utils.ThreadUtils;
-import com.kifile.android.utils.WorkerThreadPool;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 /**
  * The implement of {@link DataProvider}.
@@ -18,6 +20,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public abstract class AbstractDataProvider<DATA> implements DataProvider<DATA> {
 
+    private static Executor EXECUTOR;
+
     private final List<DataObserver<DATA>> mObservers = new CopyOnWriteArrayList<>();
 
     private DATA mData;
@@ -25,8 +29,6 @@ public abstract class AbstractDataProvider<DATA> implements DataProvider<DATA> {
     protected DataFetcher<DATA> mFetcher;
 
     protected boolean mIsAsync;
-
-    protected WorkerThreadPool.WorkerRunnable mWorker;
 
     // 由于数据加载需要通过异步线程调用，因此在此处创建一个静态的Handler，专门负责主线程通信。
     protected static Handler sHandler = new Handler();
@@ -51,6 +53,10 @@ public abstract class AbstractDataProvider<DATA> implements DataProvider<DATA> {
 
     }
 
+    public static void setDefaultExecutor(@NonNull Executor executor) {
+        EXECUTOR = executor;
+    }
+
     /**
      * Set if the fetch task run on a non-main thread.
      *
@@ -58,13 +64,6 @@ public abstract class AbstractDataProvider<DATA> implements DataProvider<DATA> {
      */
     public void setAsync(boolean async) {
         mIsAsync = async;
-    }
-
-    protected void cancelAsyncTask() {
-        if (mWorker != null) {
-            mWorker.cancel();
-            mWorker = null;
-        }
     }
 
     @Override
@@ -86,11 +85,21 @@ public abstract class AbstractDataProvider<DATA> implements DataProvider<DATA> {
     @Override
     public void refresh() {
         if (mIsAsync) {
-            cancelAsyncTask();
-            mWorker = WorkerThreadPool.getInstance().execute(mRefreshTask, true);
+            executeFetchTask(mRefreshTask);
         } else {
             mRefreshTask.run();
         }
+    }
+
+    protected final void executeFetchTask(Runnable runnable) {
+        if (EXECUTOR == null) {
+            synchronized (AbstractDataProvider.class) {
+                if (EXECUTOR == null) {
+                    EXECUTOR = Executors.newCachedThreadPool();
+                }
+            }
+        }
+        EXECUTOR.execute(runnable);
     }
 
     @Override
@@ -132,7 +141,6 @@ public abstract class AbstractDataProvider<DATA> implements DataProvider<DATA> {
 
     @Override
     public void release() {
-        cancelAsyncTask();
         mData = null;
     }
 
@@ -140,7 +148,7 @@ public abstract class AbstractDataProvider<DATA> implements DataProvider<DATA> {
      * Check if it is running on main thread, keep thread-safe.
      */
     protected final void checkMainThread() {
-        if (!ThreadUtils.isMain()) {
+        if (Looper.getMainLooper().getThread() != Thread.currentThread()) {
             throw new RuntimeException("Should run on main thread.");
         }
     }

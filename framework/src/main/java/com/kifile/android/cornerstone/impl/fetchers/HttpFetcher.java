@@ -2,7 +2,9 @@ package com.kifile.android.cornerstone.impl.fetchers;
 
 import android.util.Log;
 
+import com.kifile.android.cornerstone.core.ConvertException;
 import com.kifile.android.cornerstone.core.DataFetcher;
+import com.kifile.android.cornerstone.core.FetchException;
 import com.kifile.android.cornerstone.utils.HttpUtils;
 import com.squareup.okhttp.FormEncodingBuilder;
 import com.squareup.okhttp.Headers;
@@ -17,7 +19,6 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Map;
 
 /**
@@ -25,7 +26,7 @@ import java.util.Map;
  *
  * @author kifile
  */
-public class HttpFetcher implements DataFetcher<InputStream> {
+public class HttpFetcher implements DataFetcher<String> {
 
     public static final int METHOD_HEAD = 0;
     public static final int METHOD_GET = 1;
@@ -88,7 +89,7 @@ public class HttpFetcher implements DataFetcher<InputStream> {
     }
 
     @Override
-    public InputStream fetch() {
+    public String fetch() throws FetchException, ConvertException {
         Request.Builder requestBuilder;
         switch (mMethod) {
             case METHOD_HEAD: {
@@ -126,7 +127,7 @@ public class HttpFetcher implements DataFetcher<InputStream> {
                 }
                 Response response = HttpUtils.getResponse(requestBuilder.build());
                 if (response.isSuccessful()) {
-                    return response.body().byteStream();
+                    return response.body().string();
                 } else {
                     Log.e("HttpBody", response.body().string());
                 }

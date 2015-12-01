@@ -7,5 +7,12 @@ package com.kifile.android.cornerstone.core;
  */
 public interface DataFetcher<DATA> {
 
-    DATA fetch();
+    /**
+     * Fetch data.
+     *
+     * @return If fetch successful, return the data.
+     * @throws FetchException   Throw FetchException when you cannot fetch a data.
+     * @throws ConvertException Throw ConvertException when you cannot convert the data to another type.
+     */
+    DATA fetch() throws FetchException, ConvertException;
 }

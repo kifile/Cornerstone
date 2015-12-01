@@ -37,7 +37,7 @@ CornerStone supports Android 4.0 (Ice Cream).
 
 If you are building with gradle, please add the following line to the `dependencies` section of your `build.gradle` file:
 
-	compile 'com.kifile.android.cornerstone:Cornerstone:1.2'
+	compile 'com.kifile.android.cornerstone:Cornerstone:1.3'
 	
 ### 2.Register DataProvider Before Use It
 

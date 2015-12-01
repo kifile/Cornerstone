@@ -1,7 +1,6 @@
 package com.kifile.android.cornerstone.impl.providers;
 
 import com.kifile.android.cornerstone.core.DataFetcher;
-import com.kifile.android.utils.WorkerThreadPool;
 
 /**
  * Paged data provider.
@@ -14,7 +13,7 @@ public abstract class PageDataProvider<DATA> extends AbstractDataProvider<PageDa
 
     @Override
     public void setFetcher(DataFetcher<PageData<DATA>> fetcher) {
-        throw new RuntimeException("Should call #setPageFetcher to setFetcher");
+        throw new UnsupportedOperationException("Should call #setPageFetcher to setFetcher");
     }
 
     public void setPageFetcher(DataFetcher<DATA> fetcher) {
@@ -31,15 +30,14 @@ public abstract class PageDataProvider<DATA> extends AbstractDataProvider<PageDa
 
     public void loadPage(final int page) {
         if (mIsAsync) {
-            cancelAsyncTask();
-            mWorker = WorkerThreadPool.getInstance().execute(new Runnable() {
+            executeFetchTask(new Runnable() {
                 @Override
                 public void run() {
                     if (mFetcher != null) {
                         setPageData(page, mFetcher.fetch());
                     }
                 }
-            }, true);
+            });
         } else {
             if (mFetcher != null) {
                 setPageData(page, mFetcher.fetch());
@@ -55,7 +53,7 @@ public abstract class PageDataProvider<DATA> extends AbstractDataProvider<PageDa
 
     @Override
     protected void setData(PageData<DATA> dataPageData) {
-        throw new RuntimeException("Should call #setPageData to setData");
+        throw new UnsupportedOperationException("Should call #setPageData to setData");
     }
 
     public void setPageData(int page, DATA data) {

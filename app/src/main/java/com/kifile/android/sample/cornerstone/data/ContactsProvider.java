@@ -1,11 +1,7 @@
 package com.kifile.android.sample.cornerstone.data;
 
 import android.provider.ContactsContract;
-import android.util.Log;
 
-import com.kifile.android.cornerstone.core.AbstractFetcherConverter;
-import com.kifile.android.cornerstone.core.ConvertErrorCallback;
-import com.kifile.android.cornerstone.core.DataFetcher;
 import com.kifile.android.cornerstone.impl.annotations.Property;
 import com.kifile.android.cornerstone.impl.fetchers.AnnotationCursorConverter;
 import com.kifile.android.cornerstone.impl.providers.ContentDataProvider;
@@ -17,7 +13,7 @@ import java.util.List;
 /**
  * Created by kifile on 15/8/25.
  */
-public class ContactsProvider extends ContentDataProvider<List<ContactsProvider.Contact>> implements ConvertErrorCallback {
+public class ContactsProvider extends ContentDataProvider<List<ContactsProvider.Contact>> {
 
     public static final String KEY = ContactsProvider.class.getSimpleName();
 
@@ -26,12 +22,7 @@ public class ContactsProvider extends ContentDataProvider<List<ContactsProvider.
         setFetcher(new AnnotationCursorConverter<>(buildCursorFetcher(), Contact.class));
     }
 
-    @Override
-    public void onConvertError(Object error) {
-        Log.d(KEY, String.valueOf(error));
-    }
-
-//    public class ContactConverter extends AbstractFetcherConverter<Cursor, List<Contact>> {
+    //    public class ContactConverter extends AbstractFetcherConverter<Cursor, List<Contact>> {
 //
 //        /**
 //         * Wrap the DataFetcher will be transformed.
@@ -67,22 +58,4 @@ public class ContactsProvider extends ContentDataProvider<List<ContactsProvider.
 
     }
 
-    private class ErrorConverter extends AbstractFetcherConverter<List<Contact>, List<Contact>> {
-
-        public ErrorConverter(DataFetcher<List<Contact>> proxy) {
-            super(proxy);
-        }
-
-        public ErrorConverter(DataFetcher<List<Contact>> proxy, ConvertErrorCallback errorCallback) {
-            super(proxy, errorCallback);
-        }
-
-        @Override
-        protected List<Contact> convert(List<Contact> contact) {
-            if (contact != null) {
-                handleError("String");
-            }
-            return null;
-        }
-    }
 }

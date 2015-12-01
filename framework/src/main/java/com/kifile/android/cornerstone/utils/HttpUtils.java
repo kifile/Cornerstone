@@ -18,19 +18,17 @@ public class HttpUtils {
     private static final OkHttpClient sClient = new OkHttpClient();
 
     static {
-        // 设置连接 15 秒超时.
-        sClient.setWriteTimeout(15, TimeUnit.SECONDS);
-        sClient.setConnectTimeout(15, TimeUnit.SECONDS);
-        sClient.setReadTimeout(15, TimeUnit.SECONDS);
+        // 设置连接 5 秒超时.
+        sClient.setWriteTimeout(5, TimeUnit.SECONDS);
+        sClient.setConnectTimeout(5, TimeUnit.SECONDS);
+        sClient.setReadTimeout(5, TimeUnit.SECONDS);
     }
 
     /**
      * 执行Request命令.
      *
      * @param request
-     *
      * @return
-     *
      * @throws IOException
      */
     public static Response getResponse(Request request) throws IOException {

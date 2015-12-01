@@ -1,8 +1,10 @@
 package com.kifile.android.cornerstone.impl.fetchers;
 
+import android.annotation.NonNull;
 import android.database.Cursor;
 
 import com.kifile.android.cornerstone.core.AbstractFetcherConverter;
+import com.kifile.android.cornerstone.core.ConvertException;
 import com.kifile.android.cornerstone.core.DataFetcher;
 import com.kifile.android.cornerstone.impl.annotations.Property;
 
@@ -49,58 +51,55 @@ public class AnnotationCursorConverter<DATA> extends AbstractFetcherConverter<Cu
     }
 
     @Override
-    protected List<DATA> convert(Cursor cursor) {
-        if (cursor != null) {
-            List<DATA> datas = new ArrayList<>();
-            // Get column index of data;
-            Map<String, Integer> columnMap = new HashMap<>();
-            for (String key : mAnnotationMap.keySet()) {
-                int column = cursor.getColumnIndex(key);
-                if (column < 0) {
-                    throw new RuntimeException("Property not exist in cursor");
-                }
-                columnMap.put(key, column);
+    protected List<DATA> convert(@NonNull Cursor cursor) throws ConvertException {
+        List<DATA> datas = new ArrayList<>();
+        // Get column index of data;
+        Map<String, Integer> columnMap = new HashMap<>();
+        for (String key : mAnnotationMap.keySet()) {
+            int column = cursor.getColumnIndex(key);
+            if (column < 0) {
+                throw new RuntimeException("Property not exist in cursor");
             }
-            try {
-                for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
-                    try {
-                        DATA data = mDataClazz.newInstance();
-                        for (Map.Entry<String, Field> entry : mAnnotationMap.entrySet()) {
-                            Field field = entry.getValue();
-                            Class<?> clazz = field.getType();
-                            int column = columnMap.get(entry.getKey());
-                            if (clazz.equals(String.class)) {
-                                // For String data.
-                                field.set(data, cursor.getString(column));
-                            } else if (clazz.equals(Integer.class) || clazz.equals(int.class)) {
-                                // For int data.
-                                field.set(data, cursor.getInt(column));
-                            } else if (clazz.equals(Long.class) || clazz.equals(long.class)) {
-                                // For long data.
-                                field.set(data, cursor.getLong(column));
-                            } else if (clazz.equals(Double.class) || clazz.equals(double.class)) {
-                                // For double data.
-                                field.set(data, cursor.getDouble(column));
-                            } else if (clazz.equals(Boolean.class) || clazz.equals(boolean.class)) {
-                                // For boolean data.
-                                field.set(data, cursor.getInt(column) != 0);
-                            } else {
-                                // CursorConverter don't support other type.
-                                throw new RuntimeException("Unsupported type:" + field.getName() + field.getType().getName());
-                            }
-                        }
-                        datas.add(data);
-                    } catch (InstantiationException e) {
-                        e.printStackTrace();
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    }
-                }
-            } finally {
-                cursor.close();
-            }
-            return datas;
+            columnMap.put(key, column);
         }
-        return null;
+        try {
+            for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+                try {
+                    DATA data = mDataClazz.newInstance();
+                    for (Map.Entry<String, Field> entry : mAnnotationMap.entrySet()) {
+                        Field field = entry.getValue();
+                        Class<?> clazz = field.getType();
+                        int column = columnMap.get(entry.getKey());
+                        if (clazz.equals(String.class)) {
+                            // For String data.
+                            field.set(data, cursor.getString(column));
+                        } else if (clazz.equals(Integer.class) || clazz.equals(int.class)) {
+                            // For int data.
+                            field.set(data, cursor.getInt(column));
+                        } else if (clazz.equals(Long.class) || clazz.equals(long.class)) {
+                            // For long data.
+                            field.set(data, cursor.getLong(column));
+                        } else if (clazz.equals(Double.class) || clazz.equals(double.class)) {
+                            // For double data.
+                            field.set(data, cursor.getDouble(column));
+                        } else if (clazz.equals(Boolean.class) || clazz.equals(boolean.class)) {
+                            // For boolean data.
+                            field.set(data, cursor.getInt(column) != 0);
+                        } else {
+                            // CursorConverter don't support other type.
+                            throw new RuntimeException("Unsupported type:" + field.getName() + field.getType().getName());
+                        }
+                    }
+                    datas.add(data);
+                } catch (InstantiationException e) {
+                    throw new ConvertException(e);
+                } catch (IllegalAccessException e) {
+                    throw new ConvertException(e);
+                }
+            }
+        } finally {
+            cursor.close();
+        }
+        return datas;
     }
 }

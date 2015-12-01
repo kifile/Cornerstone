@@ -1,11 +1,13 @@
 package com.kifile.android.cornerstone.impl.fetchers;
 
+import com.kifile.android.cornerstone.core.ConvertException;
+import com.kifile.android.cornerstone.core.DataFetcher;
+import com.kifile.android.cornerstone.core.FetchException;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-
-import com.kifile.android.cornerstone.core.DataFetcher;
 
 /**
  * Fetch the InputStream of a file.
@@ -25,12 +27,11 @@ public class FileFetcher implements DataFetcher<InputStream> {
     }
 
     @Override
-    public InputStream fetch() {
+    public InputStream fetch() throws FetchException, ConvertException {
         try {
             return new FileInputStream(mFile);
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            throw new FetchException(e);
         }
-        return null;
     }
 }

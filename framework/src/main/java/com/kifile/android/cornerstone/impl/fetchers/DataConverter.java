@@ -1,6 +1,8 @@
 package com.kifile.android.cornerstone.impl.fetchers;
 
+import com.kifile.android.cornerstone.core.ConvertException;
 import com.kifile.android.cornerstone.core.DataFetcher;
+import com.kifile.android.cornerstone.core.FetchException;
 
 /**
  * DataConverter is used to invoke the exist data in DataConverter.
@@ -16,7 +18,7 @@ public class DataConverter<DATA> implements DataFetcher<DATA> {
     }
 
     @Override
-    public DATA fetch() {
+    public DATA fetch() throws FetchException, ConvertException {
         return mData;
     }
 }

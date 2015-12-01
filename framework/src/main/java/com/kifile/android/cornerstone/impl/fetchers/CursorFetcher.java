@@ -1,10 +1,12 @@
 package com.kifile.android.cornerstone.impl.fetchers;
 
-import com.kifile.android.cornerstone.core.DataFetcher;
-
 import android.content.ContentResolver;
 import android.database.Cursor;
 import android.net.Uri;
+
+import com.kifile.android.cornerstone.core.ConvertException;
+import com.kifile.android.cornerstone.core.DataFetcher;
+import com.kifile.android.cornerstone.core.FetchException;
 
 /**
  * Fetch the cursor data from content provider.
@@ -62,7 +64,7 @@ public class CursorFetcher implements DataFetcher<Cursor> {
     }
 
     @Override
-    public Cursor fetch() {
+    public Cursor fetch() throws FetchException, ConvertException {
         return mResolver.query(mUri, mProjections, mSelection, mSelectionArgs, mOrderBy);
     }
 }
