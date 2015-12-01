@@ -33,15 +33,6 @@ public abstract class AbstractDataProvider<DATA> implements DataProvider<DATA> {
     // 由于数据加载需要通过异步线程调用，因此在此处创建一个静态的Handler，专门负责主线程通信。
     protected static Handler sHandler = new Handler();
 
-    private final Runnable mRefreshTask = new Runnable() {
-        @Override
-        public void run() {
-            if (mFetcher != null) {
-                setData(mFetcher.fetch());
-            }
-        }
-    };
-
     /**
      * When you extends AbstractDataProvider, don't make the constructor having any argument.
      * <p/>
@@ -85,9 +76,22 @@ public abstract class AbstractDataProvider<DATA> implements DataProvider<DATA> {
     @Override
     public void refresh() {
         if (mIsAsync) {
-            executeFetchTask(mRefreshTask);
+            executeFetchTask(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        setData(mFetcher.fetch());
+                    } catch (Exception e) {
+                        handleException(e);
+                    }
+                }
+            });
         } else {
-            mRefreshTask.run();
+            try {
+                setData(mFetcher.fetch());
+            } catch (Exception e) {
+                handleException(e);
+            }
         }
     }
 
@@ -142,6 +146,10 @@ public abstract class AbstractDataProvider<DATA> implements DataProvider<DATA> {
     @Override
     public void release() {
         mData = null;
+    }
+
+    protected void handleException(Exception e) {
+        e.printStackTrace();
     }
 
     /**

@@ -34,13 +34,21 @@ public abstract class PageDataProvider<DATA> extends AbstractDataProvider<PageDa
                 @Override
                 public void run() {
                     if (mFetcher != null) {
-                        setPageData(page, mFetcher.fetch());
+                        try {
+                            setPageData(page, mFetcher.fetch());
+                        } catch (Exception e) {
+                            handleException(e);
+                        }
                     }
                 }
             });
         } else {
             if (mFetcher != null) {
-                setPageData(page, mFetcher.fetch());
+                try {
+                    setPageData(page, mFetcher.fetch());
+                } catch (Exception e) {
+                    handleException(e);
+                }
             }
         }
     }
