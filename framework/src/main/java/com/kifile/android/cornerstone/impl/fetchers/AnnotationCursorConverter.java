@@ -1,7 +1,7 @@
 package com.kifile.android.cornerstone.impl.fetchers;
 
-import android.annotation.NonNull;
 import android.database.Cursor;
+import android.support.annotation.NonNull;
 
 import com.kifile.android.cornerstone.core.AbstractFetcherConverter;
 import com.kifile.android.cornerstone.core.ConvertException;

@@ -1,6 +1,7 @@
 package com.kifile.android.cornerstone.core;
 
-import android.annotation.NonNull;
+
+import android.support.annotation.NonNull;
 
 /**
  * AbstractFetcherConverter is used to transform a data to another type.

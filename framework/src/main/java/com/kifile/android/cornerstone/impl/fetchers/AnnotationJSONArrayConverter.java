@@ -1,6 +1,6 @@
 package com.kifile.android.cornerstone.impl.fetchers;
 
-import android.annotation.NonNull;
+import android.support.annotation.NonNull;
 
 import com.kifile.android.cornerstone.core.AbstractFetcherConverter;
 import com.kifile.android.cornerstone.core.ConvertException;
@@ -85,14 +85,26 @@ public class AnnotationJSONArrayConverter<DATA> extends AbstractFetcherConverter
                             // For list class type,
                             Property property = field.getAnnotation(Property.class);
                             Class<?> itemType = property.type();
-                            Object value = new AnnotationJSONArrayConverter<>(
-                                    new DataConverter<>(object.optJSONArray(key)), itemType).fetch();
-                            field.set(data, value);
+                            try {
+                                Object value = new AnnotationJSONArrayConverter<>(
+                                        new DataConverter<>(object.optJSONArray(key)), itemType).fetch();
+                                field.set(data, value);
+                            } catch (ConvertException ignore) {
+                                // Sometimes convert failed.
+                            } catch (FetchException ignore) {
+                                // Sometimes convert failed.
+                            }
                         } else {
                             // For other class type,
-                            Object value = new AnnotationJSONObjectConverter<>(
-                                    new DataConverter<>(object.optJSONObject(key)), clazz).fetch();
-                            field.set(data, value);
+                            try {
+                                Object value = new AnnotationJSONObjectConverter<>(
+                                        new DataConverter<>(object.optJSONObject(key)), clazz).fetch();
+                                field.set(data, value);
+                            } catch (ConvertException ignore) {
+                                // Sometimes convert failed.
+                            } catch (FetchException ignore) {
+                                // Sometimes convert failed.
+                            }
                         }
                     }
                     datas.add(data);
@@ -100,8 +112,6 @@ public class AnnotationJSONArrayConverter<DATA> extends AbstractFetcherConverter
                     // Maybe the JSONArray just hold the value array.
                     DATA object = (DATA) array.opt(i);
                     datas.add(object);
-                } catch (FetchException e) {
-                    throw new ConvertException(e);
                 }
             }
         } catch (InstantiationException e) {
