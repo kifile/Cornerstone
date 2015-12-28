@@ -1,8 +1,8 @@
 package com.kifile.android.cornerstone.impl.providers;
 
-import android.annotation.NonNull;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.annotation.NonNull;
 
 import com.kifile.android.cornerstone.core.DataFetcher;
 import com.kifile.android.cornerstone.core.DataObserver;
@@ -80,7 +80,14 @@ public abstract class AbstractDataProvider<DATA> implements DataProvider<DATA> {
                 @Override
                 public void run() {
                     try {
-                        setData(mFetcher.fetch());
+                        final DATA data = mFetcher.fetch();
+                        // Always use handler to post the notify task.
+                        sHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                setData(data);
+                            }
+                        });
                     } catch (Exception e) {
                         handleException(e);
                     }
@@ -113,16 +120,10 @@ public abstract class AbstractDataProvider<DATA> implements DataProvider<DATA> {
     }
 
     protected void setData(final DATA data) {
-        // Always use handler to post the notify task.
-        sHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                if (mData == null || !mData.equals(data) || isDataNeedUpdate()) {
-                    mData = data;
-                    notifyDataChanged();
-                }
-            }
-        });
+        if (mData == null || !mData.equals(data) || isDataNeedUpdate()) {
+            mData = data;
+            notifyDataChanged();
+        }
     }
 
     @Override

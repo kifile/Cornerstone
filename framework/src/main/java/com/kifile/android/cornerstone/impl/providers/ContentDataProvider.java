@@ -3,10 +3,8 @@ package com.kifile.android.cornerstone.impl.providers;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.ContentObserver;
-import android.database.Cursor;
 import android.net.Uri;
 
-import com.kifile.android.cornerstone.core.DataFetcher;
 import com.kifile.android.cornerstone.impl.fetchers.CursorFetcher;
 
 /**
@@ -29,7 +27,7 @@ public class ContentDataProvider<DATA> extends AbstractDataProvider<DATA> {
         mUri = uri;
     }
 
-    public DataFetcher<Cursor> buildCursorFetcher() {
+    public CursorFetcher buildCursorFetcher() {
         if (mCursorFetcher == null) {
             mCursorFetcher = new CursorFetcher(mContentResolver, mUri);
         } else {
