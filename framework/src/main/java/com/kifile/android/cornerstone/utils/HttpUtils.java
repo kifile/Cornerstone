@@ -34,4 +34,8 @@ public class HttpUtils {
     public static Response getResponse(Request request) throws IOException {
         return sClient.newCall(request).execute();
     }
+
+    public static OkHttpClient getClient() {
+        return sClient;
+    }
 }

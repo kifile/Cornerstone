@@ -35,7 +35,14 @@ public abstract class PageDataProvider<DATA> extends AbstractDataProvider<PageDa
                 public void run() {
                     if (mFetcher != null) {
                         try {
-                            setPageData(page, mFetcher.fetch());
+                            final DATA data = mFetcher.fetch();
+                            // Always use handler to post the notify task.
+                            sHandler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    setPageData(page, data);
+                                }
+                            });
                         } catch (Exception e) {
                             handleException(e);
                         }
@@ -66,6 +73,21 @@ public abstract class PageDataProvider<DATA> extends AbstractDataProvider<PageDa
 
     public void setPageData(int page, DATA data) {
         super.setData(new PageData<>(page, data));
+    }
+
+    @Override
+    protected void handleException(Exception e) {
+        super.handleException(e);
+        if (mIsAsync) {
+            sHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    setPageData(-1, null);
+                }
+            });
+        } else {
+            setPageData(-1, null);
+        }
     }
 
     public static class PageData<DATA> {

@@ -5,8 +5,10 @@ import android.support.annotation.NonNull;
 import com.kifile.android.cornerstone.core.AbstractFetcherConverter;
 import com.kifile.android.cornerstone.core.ConvertException;
 import com.kifile.android.cornerstone.core.DataFetcher;
-import com.kifile.android.cornerstone.core.FetchException;
 import com.kifile.android.cornerstone.impl.annotations.Property;
+import com.kifile.android.cornerstone.impl.annotations.Singler;
+import com.kifile.android.cornerstone.impl.helper.SingleData;
+import com.kifile.android.cornerstone.utils.ReflectUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -29,6 +31,8 @@ public class AnnotationJSONArrayConverter<DATA> extends AbstractFetcherConverter
 
     private Map<String, Field> mAnnotationMap = new HashMap<>();
 
+    private Singler mSingler;
+
     /**
      * Wrap the DataFetcher will be transformed.
      *
@@ -41,6 +45,7 @@ public class AnnotationJSONArrayConverter<DATA> extends AbstractFetcherConverter
     }
 
     private void processAnnotation() {
+        mSingler = mDataClazz.getAnnotation(Singler.class);
         Field[] fields = mDataClazz.getFields();
         if (fields != null) {
             for (Field field : fields) {
@@ -61,50 +66,29 @@ public class AnnotationJSONArrayConverter<DATA> extends AbstractFetcherConverter
             for (int i = 0; i < array.length(); i++) {
                 try {
                     JSONObject object = array.getJSONObject(i);
-                    DATA data = mDataClazz.newInstance();
+                    DATA data = null;
+                    if (mSingler != null) {
+                        String key = mSingler.primary();
+                        Field field = mAnnotationMap.get(key);
+                        if (field == null) {
+                            throw new RuntimeException("Primary key must be existed and be annotated by Property.");
+                        }
+                        Object index = ReflectUtils.getValueFromField(object, key, field);
+                        data = SingleData.obtain(mDataClazz, index);
+                        if (data == null) {
+                            data = mDataClazz.newInstance();
+                            SingleData.updateData(mDataClazz, index, data);
+                        }
+                    }
+                    if (data == null) {
+                        data = mDataClazz.newInstance();
+                    }
                     for (Map.Entry<String, Field> entry : mAnnotationMap.entrySet()) {
                         Field field = entry.getValue();
                         String key = entry.getKey();
-                        Class<?> clazz = field.getType();
-                        if (clazz.equals(String.class)) {
-                            // For String data.
-                            field.set(data, object.optString(key));
-                        } else if (clazz.equals(Integer.class) || clazz.equals(int.class)) {
-                            // For int data.
-                            field.set(data, object.optInt(key));
-                        } else if (clazz.equals(Long.class) || clazz.equals(long.class)) {
-                            // For long data.
-                            field.set(data, object.optLong(key));
-                        } else if (clazz.equals(Double.class) || clazz.equals(double.class)) {
-                            // For double data.
-                            field.set(data, object.optDouble(key));
-                        } else if (clazz.equals(Boolean.class) || clazz.equals(boolean.class)) {
-                            // For boolean data.
-                            field.set(data, object.optBoolean(key));
-                        } else if (clazz.equals(List.class)) {
-                            // For list class type,
-                            Property property = field.getAnnotation(Property.class);
-                            Class<?> itemType = property.type();
-                            try {
-                                Object value = new AnnotationJSONArrayConverter<>(
-                                        new DataConverter<>(object.optJSONArray(key)), itemType).fetch();
-                                field.set(data, value);
-                            } catch (ConvertException ignore) {
-                                // Sometimes convert failed.
-                            } catch (FetchException ignore) {
-                                // Sometimes convert failed.
-                            }
-                        } else {
-                            // For other class type,
-                            try {
-                                Object value = new AnnotationJSONObjectConverter<>(
-                                        new DataConverter<>(object.optJSONObject(key)), clazz).fetch();
-                                field.set(data, value);
-                            } catch (ConvertException ignore) {
-                                // Sometimes convert failed.
-                            } catch (FetchException ignore) {
-                                // Sometimes convert failed.
-                            }
+                        Object value = ReflectUtils.getValueFromField(object, key, field);
+                        if (value != null) {
+                            field.set(data, value);
                         }
                     }
                     datas.add(data);
@@ -121,4 +105,5 @@ public class AnnotationJSONArrayConverter<DATA> extends AbstractFetcherConverter
         }
         return datas;
     }
+
 }

@@ -4,6 +4,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 
+import com.kifile.android.cornerstone.core.ConvertException;
 import com.kifile.android.cornerstone.core.DataFetcher;
 import com.kifile.android.cornerstone.core.DataObserver;
 import com.kifile.android.cornerstone.core.DataProvider;
