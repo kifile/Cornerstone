@@ -41,12 +41,16 @@ public class AnnotationJSONArrayConverter<DATA> extends AbstractFetcherConverter
     public AnnotationJSONArrayConverter(DataFetcher<JSONArray> proxy, Class<DATA> clazz) {
         super(proxy);
         mDataClazz = clazz;
-        processAnnotation();
+        mSingler = clazz.getAnnotation(Singler.class);
+        Class<?> c = clazz;
+        while (c != Object.class) {
+            processAnnotation(c);
+            c = c.getSuperclass();
+        }
     }
 
-    private void processAnnotation() {
-        mSingler = mDataClazz.getAnnotation(Singler.class);
-        Field[] fields = mDataClazz.getFields();
+    private void processAnnotation(Class<?> clazz) {
+        Field[] fields = clazz.getDeclaredFields();
         if (fields != null) {
             for (Field field : fields) {
                 Property property = field.getAnnotation(Property.class);
@@ -88,7 +92,7 @@ public class AnnotationJSONArrayConverter<DATA> extends AbstractFetcherConverter
                         String key = entry.getKey();
                         Object value = ReflectUtils.getValueFromField(object, key, field);
                         if (value != null) {
-                            field.set(data, value);
+                            ReflectUtils.setValue(data, field, value);
                         }
                     }
                     datas.add(data);

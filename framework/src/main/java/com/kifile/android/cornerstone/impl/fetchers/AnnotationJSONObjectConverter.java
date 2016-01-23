@@ -32,12 +32,16 @@ public class AnnotationJSONObjectConverter<DATA> extends AbstractFetcherConverte
     public AnnotationJSONObjectConverter(DataFetcher<JSONObject> proxy, Class<DATA> clazz) {
         super(proxy);
         mDataClazz = clazz;
-        processAnnotation();
+        mSingler = clazz.getAnnotation(Singler.class);
+        Class<?> c = clazz;
+        while (c != Object.class) {
+            processAnnotation(c);
+            c = c.getSuperclass();
+        }
     }
 
-    private void processAnnotation() {
-        mSingler = mDataClazz.getAnnotation(Singler.class);
-        Field[] fields = mDataClazz.getFields();
+    private void processAnnotation(Class<?> clazz) {
+        Field[] fields = clazz.getDeclaredFields();
         if (fields != null) {
             for (Field field : fields) {
                 Property property = field.getAnnotation(Property.class);
@@ -75,7 +79,7 @@ public class AnnotationJSONObjectConverter<DATA> extends AbstractFetcherConverte
                 String key = entry.getKey();
                 Object value = ReflectUtils.getValueFromField(jsonObject, key, field);
                 if (value != null) {
-                    field.set(data, value);
+                    ReflectUtils.setValue(data, field, value);
                 }
             }
             return data;
